@@ -1,0 +1,101 @@
+#!/bin/bash
+
+OutputDirDefault=~/QC
+
+while :
+do
+    case "$1" in
+      -b | --bfile) #same as normal plink - Path to all files and the shared prefix
+	        BFile="$2"  
+	        shift 2
+	        ;;
+      --bim) #/path/to/file.bim
+          BimFile="$2"
+	        shift 2
+	        ;;
+      --bed) #/path/to/file.bed
+      	  BedFile="$2"
+	        shift 2
+	        ;;
+      --fam) #/path/to/file.fam
+      	  FamFile="$2"
+	        shift 2
+	        ;;
+      -o | --output) #directory where you'd like to send all your QC folders - will be folder hierarchy
+          Outputdir="$2"
+	        shift 2
+	        ;;
+      -*) #unknown 
+      	  echo "Error: Unknown option: $1" >&2
+	        exit 1
+	        ;;
+      *)  # No more options
+          shift
+	        break
+	        ;;
+     esac
+done
+
+echo "Using bam file ${BimFile:=$BFile.bim}"
+echo "Using bed file ${BedFile:=$BFile.bed}"
+echo "Using fam file ${FamFile:=$BFile.fam}"
+
+if [ ! -e "${BimFile}" | ! -e "${FamFile}" | ! -e "${BedFile}" ]
+then
+  echo "Warning: One or more files does not exist. Exiting."
+  exit 1
+fi
+
+if [ ! -d "${OutputDir}" ]
+then
+  mkdirmkdir "${OutputDir}"
+  mkdir "${OutputDir}"/QCStep1
+  mkdir "${OutputDir}"/QCStep2
+  mkdir "${OutputDir}"/QCStep3
+  mkdir "${OutputDir}"/QCStep4
+  mkdir "${OutputDir}"/QCStep5
+  mkdir "${OutputDir}"/QCStep5/QCStep5a
+  mkdir "${OutputDir}"/QCStep5/QCSteo5b
+  mkdir "${OutputDir}"/QCStep5/QCSteo5c
+  mkdir "${OutputDir}"/QCStep5/QCSteo5d
+  mkdir "${OutputDir}"/QCStep5/QCSteo5e
+fi
+
+#1
+plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --missing --out "${OutputDir}"/QCStep1/QCStep1
+echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --missing --out ${OutputDir}/QCStep1/QCStep1" > "${OutputDir}"/QCStep1/command.txt
+#2
+plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --geno 0.01 --make-bed --out "${OutputDir}"/QCStep2/QCStep2
+echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --geno 0.01 --make-bed --out ${OutputDir}/QCStep2/QCStep2" > "${OutputDir}"/QCStep2/command.txt
+#3
+plink --bfile "${OutputDir}"/QCStep2/QCStep2 --missing --out "${OutputDir}"/QCStep3/QCStep3
+echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --missing --out ${OutputDir}/QCStep3/QCStep3" > "${OutputDir}"/QCStep3/command.txt
+#4
+plink --bfile "${OutputDir}"/QCStep2/QCStep2 --hardy --out "${OutputDir}"/QCStep4/QCStep4
+echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --hardy --out ${OutputDir}/QCStep4/QCStep4" > "${OutputDir}"/QCStep4/command.txt
+
+#I think five is where we start having user input
+#5a
+plink --bfile "${OutputDir}"/QCStep2/QCStep2 --indep-pairwise 50 5 0.3 --out "${OutputDir}"/QCStep5/QCStep5a/QCStep5a
+echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --indep-pairwise 50 5 0.3 --out ${OutputDir}/QCStep5/QCStep5a/QCStep5a" > "${OutputDir}"/QCStep5/QCStep5a/command.txt
+#5b
+plink --bfile "${OutputDir}"/QCStep2/QCStep2 --extract "${OutputDir}"/QCStep5/QCStep5a/QCStep5a.prune.in --genome --out "${OutputDir}"/QCStep5/QCStep5b/QCstep5b
+echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --extract ${OutputDir}/QCStep5/QCStep5a/QCStep5a.prune.in --genome --out ${OutputDir}/QCStep5/QCStep5b/QCstep5b" > "${OutputDir}"/QCStep5/QCStep5b/command.txt
+
+#generate missingness histograms
+#calculate HWE statistics
+
+#5c
+plink --bfile "${OutputDir}"/QCStep2/QCStep2 --het --out "${OutputDir}"/QCStep5/QCStep5C/QCStep5c
+#5d
+plink --bfile "${OutputDir}"/QCStep2/QCStep2 --extract "${OutputDir}"/QCStep5/QCStep5A/QCStep5a --make-bed --out /"${OutputDir}"/QCStep5D/QCStep5d
+#5e
+plink --bfile "${OutputDir}"/QCStep5/QCStep5D/QCStep5d --het --out /home/peter/Documents/QC_Steps/QCStep5/QCStep5E/QCStep5e
+
+#check for heterozygosity
+
+plink --bfile /home/peter/Documents/QC_Steps/QCStep5/QCStep5D/QCStep5d --remove /home/peter/Documents/QC_Steps/QCStep5/QCStep5C/QCStep5c.txt --make-bed --out /home/peter/Documents/QC_Steps/QCStep5/QCStep5F/QCStep5f
+
+#change files to build 19 (?) if necessary
+
+
