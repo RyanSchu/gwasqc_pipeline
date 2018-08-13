@@ -1,0 +1,80 @@
+#!/bin/bash
+
+OutputDirDefault=~/QC
+RelatednessDefault:=1
+while :
+do
+    case "$1" in
+      -b | --bfile) #same as normal plink - Path to all files and the shared prefix
+	        BFile="$2"  
+	        shift 2
+	        ;;
+      --bim) #/path/to/file.bim
+          BimFile="$2"
+	        shift 2
+	        ;;
+      --bed) #/path/to/file.bed
+      	  BedFile="$2"
+	        shift 2
+	        ;;
+      --fam) #/path/to/file.fam
+      	  FamFile="$2"
+	        shift 2
+	        ;;
+      -o | --output) #directory where you'd like to send all your QC folders - will be folder hierarchy
+          Outputdir="$2"
+	        shift 2
+	        ;;
+      -*) #unknown 
+      	  echo "Error: Unknown option: $1" >&2
+	        exit 1
+	        ;;
+      *)  # No more options
+          shift
+	        break
+	        ;;
+     esac
+done
+
+echo "Using bam file ${BimFile:=$BFile.bim}"
+echo "Using bed file ${BedFile:=$BFile.bed}"
+echo "Using fam file ${FamFile:=$BFile.fam}"
+
+if [ ! -e "${BimFile}" | ! -e "${FamFile}" | ! -e "${BedFile}" ]
+then
+  echo "Warning: One or more files does not exist. Exiting."
+  exit 1
+fi
+
+if [ ! -d "${OutputDir}" ]
+then
+  mkdir "${OutputDir}"
+  mkdir "${OutputDir}"/QCStep5
+  mkdir "${OutputDir}"/QCStep5/QCStep5a
+  mkdir "${OutputDir}"/QCStep5/QCSteo5b
+  mkdir "${OutputDir}"/QCStep5/QCSteo5c
+  mkdir "${OutputDir}"/QCStep5/QCSteo5d
+  mkdir "${OutputDir}"/QCStep5/QCSteo5e
+fi
+#5a
+plink --bfile "${OutputDir}"/QCStep2/QCStep2 --indep-pairwise 50 5 0.3 --out "${OutputDir}"/QCStep5/QCStep5a/QCStep5a
+echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --indep-pairwise 50 5 0.3 --out ${OutputDir}/QCStep5/QCStep5a/QCStep5a" > "${OutputDir}"/QCStep5/QCStep5a/command.txt
+#5b
+plink --bfile "${OutputDir}"/QCStep2/QCStep2 --extract "${OutputDir}"/QCStep5/QCStep5a/QCStep5a.prune.in --genome --min "${Relatedness:=$RelatednessDefault} --out "${OutputDir}"/QCStep5/QCStep5b/QCstep5b
+echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --extract ${OutputDir}/QCStep5/QCStep5a/QCStep5a.prune.in --genome --min "${Relatedness:=$RelatednessDefault} --out ${OutputDir}/QCStep5/QCStep5b/QCstep5b" > "${OutputDir}"/QCStep5/QCStep5b/command.txt
+
+#check ibd, generate missingness histograms, and remove missing SNPS/samples
+
+#5c heterozygosity check for unfiltered samples 
+~$plink --bfile /home/peter/Documents/QCSteps/QCStep2/QCStep2 --het --out /home/peter/Documents/QCSteps/QCStep5/QCStep5C/QCStep5c
+
+#5d filter out related samples
+plink --bfile /home/angela/px_yri_chol/QC/QCStep2/QCStep2 --extract /home/angela/px_yri_chol/QC/QCStep5/QCStep5a/QCStep5a.prune.in --remove /home/angela/px_yri_chol/QC/QCStep5/QCStep5d/related.to.remove.txt --make-bed --out /home/angela/px_yri_chol/QC/QCStep5/QCStep5d/QCStep5d
+#5e regenerate heterozygosity estimates for validation 
+plink --bfile /home/angela/px_yri_chol/QC/QCStep5/QCStep5d/QCStep5d --het --out /home/angela/px_yri_chol/QC/QCStep5/QCStep5e/QCStep5e
+Rscript #generate  heterozygosity histogram
+
+#user checks histogram and decides on filtering threshold
+
+#5f 
+plink --bfile /home/angela/px_yri_chol/QC/QCStep5/QCStep5d/QCStep5d --remove /home/angela/px_yri_chol/QC/QCStep5/QCStep5e/QCStep5e.txt --make-bed --out /home/angela/px_yri_chol/QC/QCStep5/QCStep5f/QCStep5f
