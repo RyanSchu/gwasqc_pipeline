@@ -49,6 +49,7 @@ fi
 if [ ! -d "${OutputDir}" ]
 then
   mkdir "${OutputDir}"
+  mkdir "${OutputDir}"/QCplots
   mkdir "${OutputDir}"/QCStep1
   mkdir "${OutputDir}"/QCStep2
   mkdir "${OutputDir}"/QCStep3
