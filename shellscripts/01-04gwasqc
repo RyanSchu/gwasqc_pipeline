@@ -60,10 +60,10 @@ then
   mkdir "${OutputDir}"/QCStep4
   mkdir "${OutputDir}"/QCStep5
   mkdir "${OutputDir}"/QCStep5/QCStep5a
-  mkdir "${OutputDir}"/QCStep5/QCSteo5b
-  mkdir "${OutputDir}"/QCStep5/QCSteo5c
-  mkdir "${OutputDir}"/QCStep5/QCSteo5d
-  mkdir "${OutputDir}"/QCStep5/QCSteo5e
+  mkdir "${OutputDir}"/QCStep5/QCStep5b
+  mkdir "${OutputDir}"/QCStep5/QCStep5c
+  mkdir "${OutputDir}"/QCStep5/QCStep5d
+  mkdir "${OutputDir}"/QCStep5/QCStep5e
 fi
 
 #1 for determining genotyping threshold
