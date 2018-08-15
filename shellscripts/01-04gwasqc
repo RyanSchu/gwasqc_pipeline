@@ -1,7 +1,7 @@
 #!/bin/bash
 
 OutputDirDefault=~/QC
-RelatednessDefault:=1
+GenotypingThresholdDefault=0.01
 while :
 do
     case "$1" in
@@ -14,23 +14,27 @@ do
 	        shift 2
 	        ;;
       --bed) #/path/to/file.bed
-      	  BedFile="$2"
+      	  	BedFile="$2"
 	        shift 2
 	        ;;
       --fam) #/path/to/file.fam
-      	  FamFile="$2"
+      	 	FamFile="$2"
+	        shift 2
+	        ;;
+      -gt | --genothreshold) #threshold to filter geotyping rate by
+      	  	GenotypingThreshold="$2"
 	        shift 2
 	        ;;
       -o | --output) #directory where you'd like to send all your QC folders - will be folder hierarchy
-          Outputdir="$2"
+          	Outputdir="$2"
 	        shift 2
 	        ;;
       -*) #unknown 
-      	  echo "Error: Unknown option: $1" >&2
+      		echo "Error: Unknown option: $1" >&2
 	        exit 1
 	        ;;
       *)  # No more options
-          shift
+         	shift
 	        break
 	        ;;
      esac
@@ -67,8 +71,8 @@ plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --missing --out "
 echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --missing --out ${OutputDir}/QCStep1/QCStep1" > "${OutputDir}"/QCStep1/command.txt
 #call rate distribution check
 #2 fitlers out based on genotyping threshold
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --geno 0.01 --make-bed --out "${OutputDir}"/QCStep2/QCStep2
-echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --geno 0.01 --make-bed --out ${OutputDir}/QCStep2/QCStep2" > "${OutputDir}"/QCStep2/command.txt
+plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --make-bed --out "${OutputDir}"/QCStep2/QCStep2
+echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --make-bed --out ${OutputDir}/QCStep2/QCStep2" > "${OutputDir}"/QCStep2/command.txt
 #3 For validation of missingness threshold and call rate distribution check
 plink --bfile "${OutputDir}"/QCStep2/QCStep2 --missing --out "${OutputDir}"/QCStep3/QCStep3
 echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --missing --out ${OutputDir}/QCStep3/QCStep3" > "${OutputDir}"/QCStep3/command.txt
