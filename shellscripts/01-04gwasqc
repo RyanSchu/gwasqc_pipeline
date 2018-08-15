@@ -77,11 +77,14 @@ echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --geno "${Genotyp
 plink --bfile "${OutputDir}"/QCStep2/QCStep2 --missing --out "${OutputDir}"/QCStep3/QCStep3
 echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --missing --out ${OutputDir}/QCStep3/QCStep3" > "${OutputDir}"/QCStep3/command.txt
 #call rate distribution validation
+
+Rscript ../Rscripts/CallRateDistribution.R -t "${GenotypingThreshold}" --QCdir "${OutputDir}"
+
 #4 for later calculating HWE statistics
 plink --bfile "${OutputDir}"/QCStep2/QCStep2 --hardy --out "${OutputDir}"/QCStep4/QCStep4
 echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --hardy --out ${OutputDir}/QCStep4/QCStep4" > "${OutputDir}"/QCStep4/command.txt
 #calculate HWE statistics
 
-
+Rscript ../Rscripts/hwe.R --QCdir "${OutputDir}"
 
 
