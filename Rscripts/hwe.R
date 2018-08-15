@@ -9,13 +9,13 @@ args <- parser$parse_args()
 
 "%&%" = function(a,b) paste (a,b,sep="")
 
-
 hwe <- read.table(args$QCdir %&% "/QCStep4/QCStep4.hwe", header = T)
-summary(hwe$P)
 pdf(args$QCdir %&% "/QCstats/hwestats.pdf")
 hist(hwe$P)
 dev.off()
 
-table(hwe$P<1e-06)
-table(hwe$P<1e-06)/sum(table(hwe$P<1e-06))
-``
+hwestats<-args$QCdir %&% "/QCstats/HWEstats.txt"
+write(summary(hwe$P),hwestats, append=T)
+write(table(hwe$P<1e-06), hwestats, append=T)
+write(table(hwe$P<1e-06)/sum(table(hwe$P<1e-06)), hwestats, append=T)
+
