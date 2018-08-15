@@ -44,13 +44,13 @@ echo "Using bam file ${BimFile:=$BFile.bim}"
 echo "Using bed file ${BedFile:=$BFile.bed}"
 echo "Using fam file ${FamFile:=$BFile.fam}"
 
-if [ ! -e "${BimFile}" | ! -e "${FamFile}" | ! -e "${BedFile}" ]
+if [ ! -e "${BimFile}" ] || [ ! -e "${FamFile}" ] || [ ! -e "${BedFile}" ]
 then
   echo "Warning: One or more files does not exist. Exiting."
   exit 1
 fi
 
-if [ ! -d "${OutputDir}" ]
+if [ ! -d "${OutputDir:=$OutputDirDefault}" ]
 then
   mkdir "${OutputDir}"
   mkdir "${OutputDir}"/QCstats

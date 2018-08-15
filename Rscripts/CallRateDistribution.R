@@ -1,3 +1,4 @@
+devtools::install_github("argparse", "trevorld")
 library(dplyr)
 library(tidyr)
 library(ggplot2)
@@ -26,9 +27,9 @@ dev.off()
 #stats
 statsfile<- args$QCdir %&% "/QCstats/missingness.txt"
 #Initial SNP count, SNP count after filtering, individual count after filtering
-init<- "Initial number of SNPs is " "%&%" dim(lmiss)[1]
+init<- "Initial number of SNPs is " %&% dim(lmiss)[1]
 final<- paste("Number of SNPs after filtering with out call rates < ", percentage, " is ", dim(newlmiss)[1], sep="")
-indiv<- "Number of individuals after filtering is " "%&%" dim(imiss)[1]
+indiv<- "Number of individuals after filtering is " %&% dim(imiss)[1]
 write(init, statsfile, append=T)
 write(final, statsfile, append=T)
 write(indiv, statsfile, append=T)
