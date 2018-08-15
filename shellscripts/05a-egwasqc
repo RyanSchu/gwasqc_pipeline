@@ -59,22 +59,19 @@ fi
 #5a
 plink --bfile "${OutputDir}"/QCStep2/QCStep2 --indep-pairwise 50 5 0.3 --out "${OutputDir}"/QCStep5/QCStep5a/QCStep5a
 echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --indep-pairwise 50 5 0.3 --out ${OutputDir}/QCStep5/QCStep5a/QCStep5a" > "${OutputDir}"/QCStep5/QCStep5a/command.txt
-#5b
+#5b generate relatedness and LD files from unfiltered
 plink --bfile "${OutputDir}"/QCStep2/QCStep2 --extract "${OutputDir}"/QCStep5/QCStep5a/QCStep5a.prune.in --genome --min "${Relatedness:=$RelatednessDefault} --out "${OutputDir}"/QCStep5/QCStep5b/QCstep5b
 echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --extract ${OutputDir}/QCStep5/QCStep5a/QCStep5a.prune.in --genome --min "${Relatedness:=$RelatednessDefault} --out ${OutputDir}/QCStep5/QCStep5b/QCstep5b" > "${OutputDir}"/QCStep5/QCStep5b/command.txt
 
-#check ibd, generate missingness histograms, and remove missing SNPS/samples
+Rscript ibd.R --QCdir "${OutputDir}"
 
 #5c heterozygosity check for unfiltered samples 
-~$plink --bfile /home/peter/Documents/QCSteps/QCStep2/QCStep2 --het --out /home/peter/Documents/QCSteps/QCStep5/QCStep5C/QCStep5c
-
+plink --bfile "${OutputDir}"/QCStep2/QCStep2 --het --out "${OutputDir}"/QCStep5/QCStep5C/QCStep5c
 #5d filter out related samples
-plink --bfile /home/angela/px_yri_chol/QC/QCStep2/QCStep2 --extract /home/angela/px_yri_chol/QC/QCStep5/QCStep5a/QCStep5a.prune.in --remove /home/angela/px_yri_chol/QC/QCStep5/QCStep5d/related.to.remove.txt --make-bed --out /home/angela/px_yri_chol/QC/QCStep5/QCStep5d/QCStep5d
+plink --bfile "${OutputDir}"/QCStep2/QCStep2 --extract "${OutputDir}"/QCStep5/QCStep5a/QCStep5a.prune.in --remove "${OutputDir}"/QCstats/related.to.remove.txt --make-bed --out /home/angela/px_yri_chol/QC/QCStep5/QCStep5d/QCStep5d
 #5e regenerate heterozygosity estimates for validation 
 plink --bfile /home/angela/px_yri_chol/QC/QCStep5/QCStep5d/QCStep5d --het --out /home/angela/px_yri_chol/QC/QCStep5/QCStep5e/QCStep5e
-Rscript #generate  heterozygosity histogram
+
+Rscript #generate  heterozygosity histograms
 
 #user checks histogram and decides on filtering threshold
-
-#5f 
-plink --bfile /home/angela/px_yri_chol/QC/QCStep5/QCStep5d/QCStep5d --remove /home/angela/px_yri_chol/QC/QCStep5/QCStep5e/QCStep5e.txt --make-bed --out /home/angela/px_yri_chol/QC/QCStep5/QCStep5f/QCStep5f
