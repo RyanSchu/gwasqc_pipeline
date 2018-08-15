@@ -15,7 +15,9 @@ hist(hwe$P)
 dev.off()
 
 hwestats<-args$QCdir %&% "/QCstats/HWEstats.txt"
+write("    Min.   1st Qu.    Median      Mean   3rd Qu.      Max.", hwestats)
 write(summary(hwe$P),hwestats, append=T)
+write("P<1e-06   P>1e-06",hwestats,append=T)
 write(table(hwe$P<1e-06), hwestats, append=T)
 write(table(hwe$P<1e-06)/sum(table(hwe$P<1e-06)), hwestats, append=T)
 
