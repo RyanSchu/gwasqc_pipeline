@@ -40,19 +40,16 @@ do
      esac
 done
 
-echo "Using bam file ${BimFile:=$BFile.bim}"
-echo "Using bed file ${BedFile:=$BFile.bed}"
-echo "Using fam file ${FamFile:=$BFile.fam}"
-
-if [ ! -e "${BimFile}" ] || [ ! -e "${FamFile}" ] || [ ! -e "${BedFile}" ]
-then
-  echo "Warning: One or more files does not exist. Exiting."
-  exit 1
-fi
+echo "Using QC steps located in ${OutputDir:=OutputDirDefault}"
 
 if [ ! -d "${OutputDir}" ]
 then
-  mkdir "${OutputDir}"
+  echo "Warning: Missingness filtering does not exist. Please run 01-04gwas and try again. Exiting."
+  exit 1
+fi
+
+if [ ! -d "${OutputDir}"/QCStep5 ]
+then
   mkdir "${OutputDir}"/QCStep5
   mkdir "${OutputDir}"/QCStep5/QCStep5a
   mkdir "${OutputDir}"/QCStep5/QCSteo5b
