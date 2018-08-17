@@ -1,17 +1,22 @@
 #!/bin/bash
 
+AutosomeDefault=F
 BfileDefault=/home/wheelerlab2/Data/MESA_dbGaP_55081/phg000071.v2.NHLBI_SHARE_MESA.genotype-calls-matrixfmt.c1/SHARE_MESA_c1
 OutputDirDefault=~/QC
 GenotypingThresholdDefault=0.01
 while :
 do
     case "$1" in
+      -a | --autosome) #same as normal plink - Path to all files and the shared prefix
+	        Autosome=T 
+	        shift 1
+	        ;;
       -b | --bfile) #same as normal plink - Path to all files and the shared prefix
 	        BFile="$2"  
 	        shift 2
 	        ;;
       --bim) #/path/to/file.bim
-          BimFile="$2"
+        	  BimFile="$2"
 	        shift 2
 	        ;;
       --bed) #/path/to/file.bed
@@ -77,19 +82,39 @@ then
   mkdir "${OutputDir}"/QCStep5/QCStep5e
 fi
 
-#0
+#0 Optional prefiltering step for sample selection and for autosomal filtering
 case "${prefilter}" in 
 	keep)
-		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --make-bed --out "${OutputDir}"/QCstep0
-		BedFile="${OutputDir}"/QCstep0.bed
-		BimFile="${OutputDir}"/QCstep0.Bim
-		FamFile="${OutputDir}"/QCstep0.Fam
+		if [ "${Autosome:=AutosomeDefault}" = "F" ] 
+		then
+			plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --make-bed --out "${OutputDir}"/QCstep0
+			BedFile="${OutputDir}"/QCstep0.bed
+			BimFile="${OutputDir}"/QCstep0.Bim
+			FamFile="${OutputDir}"/QCstep0.Fam
+		elif [ "${Autosome:=AutosomeDefault}" = "T" ] 
+		then
+			plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --autosome --make-bed --out "${OutputDir}"/QCstep0
+			BedFile="${OutputDir}"/QCstep0.bed
+			BimFile="${OutputDir}"/QCstep0.Bim
+			FamFile="${OutputDir}"/QCstep0.Fam
+		fi
 	remove)
-		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --make-bed --out "${OutputDir}"/QCstep0
-		BedFile="${OutputDir}"/QCstep0.bed
-		BimFile="${OutputDir}"/QCstep0.Bim
-		FamFile="${OutputDir}"/QCstep0.Fam
+		if [ "${Autosome:=AutosomeDefault}" = "F" ] 
+		then
+			plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --make-bed --out "${OutputDir}"/QCstep0
+			BedFile="${OutputDir}"/QCstep0.bed
+			BimFile="${OutputDir}"/QCstep0.Bim
+			FamFile="${OutputDir}"/QCstep0.Fam
+		elif [ "${Autosome:=AutosomeDefault}" = "T" ] 
+		then
+			plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --autosome --make-bed --out "${OutputDir}"/QCstep0
+			BedFile="${OutputDir}"/QCstep0.bed
+			BimFile="${OutputDir}"/QCstep0.Bim
+			FamFile="${OutputDir}"/QCstep0.Fam
+		fi
 esac
+
+
 #1 for determining genotyping threshold
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --missing --out "${OutputDir}"/QCStep1/QCStep1
 echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --missing --out ${OutputDir}/QCStep1/QCStep1" > "${OutputDir}"/QCStep1/command.txt
