@@ -10,7 +10,7 @@ args <- parser$parse_args()
 "%&%" = function(a,b) paste (a,b,sep="")
 
 ##Following QCStep5b
-ibd <- read.table(args$QCdir %&% "/QCStep5/QCStep5b/QCStep5b.genome", header = T)
+ibd <- read.table(args$QCdir %&% "/QCStep5/QCStep5b/QCstep5b.genome", header = T)
 pdf(args$QCdir %&% "/QCstats/IBD.pdf")
 ggplot(data=ibd,aes(x=Z0,y=Z1))+geom_point(alpha=1/4)+theme_bw()
 dev.off()
