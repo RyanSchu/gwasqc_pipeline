@@ -93,17 +93,21 @@ case "${Autosome:=AutosomeDefault}" in
 				BedFile="${OutputDir}"/QCstep0.bed
 				BimFile="${OutputDir}"/QCstep0.Bim
 				FamFile="${OutputDir}"/QCstep0.Fam
+				;;
 			remove)
 				plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --autosome --make-bed --out "${OutputDir}"/QCstep0
 				BedFile="${OutputDir}"/QCstep0.bed
 				BimFile="${OutputDir}"/QCstep0.Bim
 				FamFile="${OutputDir}"/QCstep0.Fam
+				;;
 			none)
 				plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --autosome --make-bed --out "${OutputDir}"/QCstep0
 				BedFile="${OutputDir}"/QCstep0.bed
 				BimFile="${OutputDir}"/QCstep0.Bim
 				FamFile="${OutputDir}"/QCstep0.Fam
+				;;
 		esac
+		;;
 	F)
 		case "${Prefilter:=PrefilterDefault}" in 
 			keep)
@@ -111,12 +115,15 @@ case "${Autosome:=AutosomeDefault}" in
 				BedFile="${OutputDir}"/QCstep0.bed
 				BimFile="${OutputDir}"/QCstep0.Bim
 				FamFile="${OutputDir}"/QCstep0.Fam
+				;;
 			remove)
 				plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --make-bed --out "${OutputDir}"/QCstep0
 				BedFile="${OutputDir}"/QCstep0.bed
 				BimFile="${OutputDir}"/QCstep0.Bim
 				FamFile="${OutputDir}"/QCstep0.Fam
+				;;
 		esac
+		;;
 esac
 
 #1 for determining genotyping threshold
