@@ -58,9 +58,9 @@ do
      esac
 done
 
-echo "Using bim file ${BimFile:=${BFile:=BfileDefault}.bim}"
-echo "Using bed file ${BedFile:=${BFile:=BfileDefault}.bed}"
-echo "Using fam file ${FamFile:=${BFile:=BfileDefault}.fam}"
+echo "Using bim file ${BimFile:=${BFile:=$BfileDefault}.bim}"
+echo "Using bed file ${BedFile:=${BFile:=$BfileDefault}.bed}"
+echo "Using fam file ${FamFile:=${BFile:=$BfileDefault}.fam}"
 
 if [ ! -e "${BimFile}" ] || [ ! -e "${FamFile}" ] || [ ! -e "${BedFile}" ]
 then
