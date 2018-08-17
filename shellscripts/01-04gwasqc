@@ -1,5 +1,6 @@
 #!/bin/bash
 
+BfileDefault=/home/wheelerlab2/Data/MESA_dbGaP_55081/phg000071.v2.NHLBI_SHARE_MESA.genotype-calls-matrixfmt.c1/SHARE_MESA_c1
 OutputDirDefault=~/QC
 GenotypingThresholdDefault=0.01
 while :
@@ -21,12 +22,22 @@ do
       	 	FamFile="$2"
 	        shift 2
 	        ;;
+      -k | --keep) #list of individuals you would like to keep. mutually exclusive with remove
+      	  	KeepList="$2"
+	        Prefilter=keep
+		shift 2
+	        ;;
       -gt | --genothreshold) #threshold to filter geotyping rate by
       	  	GenotypingThreshold="$2"
 	        shift 2
 	        ;;
       -o | --output) #directory where you'd like to send all your QC folders - will be folder hierarchy
           	Outputdir="$2"
+	        shift 2
+	        ;;
+      -r | --remove) #list of individuals you would like to remove
+      	  	RemoveList="$2"
+		Prefilter=remove
 	        shift 2
 	        ;;
       -*) #unknown 
@@ -66,6 +77,19 @@ then
   mkdir "${OutputDir}"/QCStep5/QCStep5e
 fi
 
+#0
+case "${prefilter}" in 
+	keep)
+		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --make-bed --out "${OutputDir}"/QCstep0
+		BedFile="${OutputDir}"/QCstep0.bed
+		BimFile="${OutputDir}"/QCstep0.Bim
+		FamFile="${OutputDir}"/QCstep0.Fam
+	remove)
+		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --make-bed --out "${OutputDir}"/QCstep0
+		BedFile="${OutputDir}"/QCstep0.bed
+		BimFile="${OutputDir}"/QCstep0.Bim
+		FamFile="${OutputDir}"/QCstep0.Fam
+esac
 #1 for determining genotyping threshold
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --missing --out "${OutputDir}"/QCStep1/QCStep1
 echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --missing --out ${OutputDir}/QCStep1/QCStep1" > "${OutputDir}"/QCStep1/command.txt
