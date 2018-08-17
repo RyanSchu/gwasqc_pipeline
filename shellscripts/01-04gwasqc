@@ -39,7 +39,7 @@ do
 	        shift 2
 	        ;;
       -o | --output) #directory where you'd like to send all your QC folders - will be folder hierarchy
-          	Outputdir="$2"
+          	OutputDir="$2"
 	        shift 2
 	        ;;
       -r | --remove) #list of individuals you would like to remove
