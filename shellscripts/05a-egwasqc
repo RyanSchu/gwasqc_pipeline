@@ -40,7 +40,7 @@ do
      esac
 done
 
-echo "Using QC steps located in ${OutputDir:=OutputDirDefault}"
+echo "Using QC steps located in ${OutputDir:=$OutputDirDefault}"
 
 if [ ! -d "${OutputDir}" ]
 then
