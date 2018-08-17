@@ -26,7 +26,7 @@ do
 	        shift 2
 	        ;;
       -r | --relatedness) Relatedness threshold you'd like to filter by
-         	Outputdir="$2"
+         	Relatedness="$2"
 	        shift 2
 	        ;;
       -*) #unknown 
