@@ -4,7 +4,7 @@ library(ggplot2)
 library(argparse)
 
 parser <- ArgumentParser()
-parser$add_argument("-r","--relatedness",help="Threshold of relatedness used for filtering
+parser$add_argument("-r","--relatedness",help="Threshold of relatedness used for filtering")
 parser$add_argument("--QCdir", help="directory where all the QC steps are written")
 args <- parser$parse_args()
 
@@ -18,7 +18,7 @@ oldpar = par(mfrow=c(1,2))
 
 pdf(args$QCdir %&% "/QCstats/Heterozygosity.pdf")
 hist(H,50, main="H estimate before filtering")
-hist(HET$F,50, main="Heterozygosity estimates prior to filtering)
+hist(HET$F,50, main="Heterozygosity estimates prior to filtering")
 abline(v=mean(HET$F)+6*sd(HET$F),col="red")
 abline(v=mean(HET$F)-6*sd(HET$F),col="red")
 hist(newHET$F,50, main="Heterozygosity estimates after filtering by relatedness threshold of " %&%)
