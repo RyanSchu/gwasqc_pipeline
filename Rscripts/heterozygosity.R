@@ -26,7 +26,7 @@ abline(v=mean(newHET$F)+6*sd(newHET$F),col="red")
 abline(v=mean(newHET$F)-6*sd(newHET$F),col="red")
 dev.off()
 
-write("Min. 1st Qu. Median Mean 3rd Qu. Max. of HET$F", hwestats)
+write("Min. 1st Qu. Median Mean 3rd Qu. Max. of HET$F", hetstats)
 write(summary(HET$F),hetstats, append=T)
 
 par(oldpar)
