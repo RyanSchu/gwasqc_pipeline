@@ -89,32 +89,32 @@ case "${Autosome:=$AutosomeDefault}:${Prefilter:=$PrefilterDefault}" in
 	True:keep)
 		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --autosome --make-bed --out "${OutputDir}"/QCstep0
 		BedFile="${OutputDir}"/QCstep0.bed
-		BimFile="${OutputDir}"/QCstep0.Bim
-		FamFile="${OutputDir}"/QCstep0.Fam
+		BimFile="${OutputDir}"/QCstep0.bim
+		FamFile="${OutputDir}"/QCstep0.fam
 		;;
 	True:remove)
 		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --autosome --make-bed --out "${OutputDir}"/QCstep0
 		BedFile="${OutputDir}"/QCstep0.bed
-		BimFile="${OutputDir}"/QCstep0.Bim
-		FamFile="${OutputDir}"/QCstep0.Fam
+		BimFile="${OutputDir}"/QCstep0.bim
+		FamFile="${OutputDir}"/QCstep0.fam
 		;;
 	True:none)
 		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --autosome --make-bed --out "${OutputDir}"/QCstep0
 		BedFile="${OutputDir}"/QCstep0.bed
-		BimFile="${OutputDir}"/QCstep0.Bim
-		FamFile="${OutputDir}"/QCstep0.Fam
+		BimFile="${OutputDir}"/QCstep0.bim
+		FamFile="${OutputDir}"/QCstep0.fam
 		;;
 	False:keep)
 		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --make-bed --out "${OutputDir}"/QCstep0
 		BedFile="${OutputDir}"/QCstep0.bed
-		BimFile="${OutputDir}"/QCstep0.Bim
-		FamFile="${OutputDir}"/QCstep0.Fam
+		BimFile="${OutputDir}"/QCstep0.bim
+		FamFile="${OutputDir}"/QCstep0.fam
 		;;
 	False:remove)
 		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --make-bed --out "${OutputDir}"/QCstep0
 		BedFile="${OutputDir}"/QCstep0.bed
-		BimFile="${OutputDir}"/QCstep0.Bim
-		FamFile="${OutputDir}"/QCstep0.Fam
+		BimFile="${OutputDir}"/QCstep0.bim
+		FamFile="${OutputDir}"/QCstep0.fam
 		;;
 esac
 
