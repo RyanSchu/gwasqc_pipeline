@@ -85,7 +85,7 @@ then
 fi
 
 #0 Optional prefiltering step for sample selection and for autosomal filtering
-case ${Autosome:=AutosomeDefault}" in
+case "${Autosome:=AutosomeDefault}" in
 	T)
 		case "${Prefilter:=PrefilterDefault}" in 
 			keep)
