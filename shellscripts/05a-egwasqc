@@ -10,19 +10,23 @@ do
 	        shift 2
 	        ;;
       --bim) #/path/to/file.bim
-          BimFile="$2"
+         	BimFile="$2"
 	        shift 2
 	        ;;
       --bed) #/path/to/file.bed
-      	  BedFile="$2"
+      	 	BedFile="$2"
 	        shift 2
 	        ;;
       --fam) #/path/to/file.fam
-      	  FamFile="$2"
+      		FamFile="$2"
 	        shift 2
 	        ;;
       -o | --output) #directory where you'd like to send all your QC folders - will be folder hierarchy
-          Outputdir="$2"
+         	Outputdir="$2"
+	        shift 2
+	        ;;
+      -r | --relatedness) Relatedness threshold you'd like to filter by
+         	Outputdir="$2"
 	        shift 2
 	        ;;
       -*) #unknown 
@@ -75,5 +79,5 @@ echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --extract ${OutputDir}/QCStep5/
 #5e regenerate heterozygosity estimates from filtered for validation
 plink --bfile "${OutputDir}"/QCStep5/QCStep5d/QCStep5d --het --out "${OutputDir}"/QCStep5/QCStep5e/QCStep5e
 
-Rscript #generate  heterozygosity histograms
+Rscript ~/gwas_pipeline/Rscripts/heterozygosity.R --QCdir "${OutputDir}" -r "${Relatedness}"
 
