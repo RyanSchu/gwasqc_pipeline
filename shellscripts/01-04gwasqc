@@ -1,6 +1,6 @@
 #!/bin/bash
 
-AutosomeDefault=F
+AutosomeDefault=False
 BfileDefault=/home/wheelerlab2/Data/MESA_dbGaP_55081/phg000071.v2.NHLBI_SHARE_MESA.genotype-calls-matrixfmt.c1/SHARE_MESA_c1
 GenotypingThresholdDefault=0.01
 OutputDirDefault=~/QC
@@ -10,7 +10,7 @@ while :
 do
     case "$1" in
       -a | --autosome) #same as normal plink - Path to all files and the shared prefix
-	        Autosome=T 
+	        Autosome=True
 	        shift 1
 	        ;;
       -b | --bfile) #same as normal plink - Path to all files and the shared prefix
@@ -85,44 +85,36 @@ then
 fi
 
 #0 Optional prefiltering step for sample selection and for autosomal filtering
-case "${Autosome:=AutosomeDefault}" in
-	T)
-		case "${Prefilter:=PrefilterDefault}" in 
-			keep)
-				plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --autosome --make-bed --out "${OutputDir}"/QCstep0
-				BedFile="${OutputDir}"/QCstep0.bed
-				BimFile="${OutputDir}"/QCstep0.Bim
-				FamFile="${OutputDir}"/QCstep0.Fam
-				;;
-			remove)
-				plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --autosome --make-bed --out "${OutputDir}"/QCstep0
-				BedFile="${OutputDir}"/QCstep0.bed
-				BimFile="${OutputDir}"/QCstep0.Bim
-				FamFile="${OutputDir}"/QCstep0.Fam
-				;;
-			none)
-				plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --autosome --make-bed --out "${OutputDir}"/QCstep0
-				BedFile="${OutputDir}"/QCstep0.bed
-				BimFile="${OutputDir}"/QCstep0.Bim
-				FamFile="${OutputDir}"/QCstep0.Fam
-				;;
-		esac
+case "${Autosome:=AutosomeDefault}:${Prefilter:=PrefilterDefault}" in
+	True:keep)
+		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --autosome --make-bed --out "${OutputDir}"/QCstep0
+		BedFile="${OutputDir}"/QCstep0.bed
+		BimFile="${OutputDir}"/QCstep0.Bim
+		FamFile="${OutputDir}"/QCstep0.Fam
 		;;
-	F)
-		case "${Prefilter:=PrefilterDefault}" in 
-			keep)
-				plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --make-bed --out "${OutputDir}"/QCstep0
-				BedFile="${OutputDir}"/QCstep0.bed
-				BimFile="${OutputDir}"/QCstep0.Bim
-				FamFile="${OutputDir}"/QCstep0.Fam
-				;;
-			remove)
-				plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --make-bed --out "${OutputDir}"/QCstep0
-				BedFile="${OutputDir}"/QCstep0.bed
-				BimFile="${OutputDir}"/QCstep0.Bim
-				FamFile="${OutputDir}"/QCstep0.Fam
-				;;
-		esac
+	True:remove)
+		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --autosome --make-bed --out "${OutputDir}"/QCstep0
+		BedFile="${OutputDir}"/QCstep0.bed
+		BimFile="${OutputDir}"/QCstep0.Bim
+		FamFile="${OutputDir}"/QCstep0.Fam
+		;;
+	True:none)
+		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --autosome --make-bed --out "${OutputDir}"/QCstep0
+		BedFile="${OutputDir}"/QCstep0.bed
+		BimFile="${OutputDir}"/QCstep0.Bim
+		FamFile="${OutputDir}"/QCstep0.Fam
+		;;
+	False:keep)
+		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --make-bed --out "${OutputDir}"/QCstep0
+		BedFile="${OutputDir}"/QCstep0.bed
+		BimFile="${OutputDir}"/QCstep0.Bim
+		FamFile="${OutputDir}"/QCstep0.Fam
+		;;
+	False:remove)
+		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --make-bed --out "${OutputDir}"/QCstep0
+		BedFile="${OutputDir}"/QCstep0.bed
+		BimFile="${OutputDir}"/QCstep0.Bim
+		FamFile="${OutputDir}"/QCstep0.Fam
 		;;
 esac
 
