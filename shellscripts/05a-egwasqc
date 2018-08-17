@@ -65,7 +65,7 @@ echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --indep-pairwise 50 5 0.3 --out
 plink --bfile "${OutputDir}"/QCStep2/QCStep2 --extract "${OutputDir}"/QCStep5/QCStep5a/QCStep5a.prune.in --genome --min "${Relatedness:=$RelatednessDefault} --out "${OutputDir}"/QCStep5/QCStep5b/QCstep5b
 echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --extract ${OutputDir}/QCStep5/QCStep5a/QCStep5a.prune.in --genome --min "${Relatedness:=$RelatednessDefault} --out ${OutputDir}/QCStep5/QCStep5b/QCstep5b" > "${OutputDir}"/QCStep5/QCStep5b/command.txt
 
-Rscript ~/gwas_pipeline/Rscripts/ibd.R --QCdir "${OutputDir}" #generate list of related samples and duplicates for removal
+Rscript ~/gwasqc_pipeline/Rscripts/ibd.R --QCdir "${OutputDir}" #generate list of related samples and duplicates for removal
 
 #5c heterozygosity check for unfiltered samples 
 plink --bfile "${OutputDir}"/QCStep2/QCStep2 --het --out "${OutputDir}"/QCStep5/QCStep5C/QCStep5c
@@ -76,5 +76,5 @@ echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --extract ${OutputDir}/QCStep5/
 #5e regenerate heterozygosity estimates from filtered for validation
 plink --bfile "${OutputDir}"/QCStep5/QCStep5d/QCStep5d --het --out "${OutputDir}"/QCStep5/QCStep5e/QCStep5e
 
-Rscript ~/gwas_pipeline/Rscripts/heterozygosity.R --QCdir "${OutputDir}" -r "${Relatedness}"
+Rscript ~/gwasqc_pipeline/Rscripts/heterozygosity.R --QCdir "${OutputDir}" -r "${Relatedness}"
 
