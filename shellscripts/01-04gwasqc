@@ -85,7 +85,7 @@ then
 fi
 
 #0 Optional prefiltering step for sample selection and for autosomal filtering
-case "${Autosome:=AutosomeDefault}:${Prefilter:=PrefilterDefault}" in
+case "${Autosome:=$AutosomeDefault}:${Prefilter:=$PrefilterDefault}" in
 	True:keep)
 		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --autosome --make-bed --out "${OutputDir}"/QCstep0
 		BedFile="${OutputDir}"/QCstep0.bed
