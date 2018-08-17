@@ -33,7 +33,7 @@ pdf(args$QCdir %&% "/QCstats/ibd_pi_hat.pdf")
 hist(others$PI_HAT)
 dev.off()
 
-sortOthers <- others[order(others$PI_HAT, decreasing = TRUE),]
+#sortOthers <- others[order(others$PI_HAT, decreasing = TRUE),]
 ##Unexpected duplicates:
-filter(others,PI_HAT>=0.2)
+#filter(others,PI_HAT>=0.2)
 write.table(filter(others,PI_HAT>=0.25), args$QCdir %&% "/QCstats/related.to.remove.txt", quote = FALSE, row.names = FALSE)
