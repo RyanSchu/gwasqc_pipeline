@@ -68,8 +68,8 @@ echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --extract ${OutputDir}/QCStep5/
 Rscript ~/gwasqc_pipeline/Rscripts/ibd.R --QCdir "${OutputDir}" #generate list of related samples and duplicates for removal
 
 #5c heterozygosity check for unfiltered samples 
-plink --bfile "${OutputDir}"/QCStep2/QCStep2 --het --out "${OutputDir}"/QCStep5/QCStep5C/QCStep5c
-echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --het --out ${OutputDir}/QCStep5/QCStep5C/QCStep5c" > "${OutputDir}"/QCStep5/QCStep5c/command.txt
+plink --bfile "${OutputDir}"/QCStep2/QCStep2 --het --out "${OutputDir}"/QCStep5/QCStep5c/QCStep5c
+echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --het --out ${OutputDir}/QCStep5/QCStep5c/QCStep5c" > "${OutputDir}"/QCStep5/QCStep5c/command.txt
 #5d filter out related individuals and duplicates
 plink --bfile "${OutputDir}"/QCStep2/QCStep2 --extract "${OutputDir}"/QCStep5/QCStep5a/QCStep5a.prune.in --remove "${OutputDir}"/QCstats/related.to.remove.txt --make-bed --out "${OutputDir}"/QCStep5/QCStep5d/QCStep5d
 echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --extract ${OutputDir}/QCStep5/QCStep5a/QCStep5a.prune.in --remove ${OutputDir}/QCstats/related.to.remove.txt --make-bed --out ${OutputDir}/QCStep5/QCStep5d/QCStep5d" > "${OutputDir}"/QCStep5/QCStep5d/command.txt
