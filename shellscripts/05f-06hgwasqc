@@ -1,0 +1,47 @@
+#!/bin/bash
+
+OutputDirDefault=~/QC
+while :
+do
+    case "$1" in
+      -b | --bfile) #same as normal plink - Path to all files and the shared prefix
+	        BFile="$2"  
+	        shift 2
+	        ;;
+      --bim) #/path/to/file.bim
+         	BimFile="$2"
+	        shift 2
+	        ;;
+      --bed) #/path/to/file.bed
+      	 	BedFile="$2"
+	        shift 2
+	        ;;
+      --fam) #/path/to/file.fam
+      		FamFile="$2"
+	        shift 2
+	        ;;
+      -o | --output) #directory where you'd like to send all your QC folders - will be folder hierarchy
+         	Outputdir="$2"
+	        shift 2
+      -*) #unknown 
+      	  echo "Error: Unknown option: $1" >&2
+	        exit 1
+	        ;;
+      *)  # No more options
+          shift
+	        break
+	        ;;
+     esac
+done
+
+echo "Using QC steps located in ${OutputDir:=$OutputDirDefault}"
+if [ ! -d "${OutputDir}"/QCStep5 ]
+then
+  echo "Warning: relatedness filtering does not exist. Please run 05a-e4gwasqc and try again. Exiting."
+  exit 1
+fi
+
+
+
+
+
