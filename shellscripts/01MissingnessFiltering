@@ -9,7 +9,7 @@ PrefilterDefault=none
 while :
 do
     case "$1" in
-      -a | --autosome) #same as normal plink - Path to all files and the shared prefix
+      -a | --autosome) #flag for initial filtering by autosome
 	        Autosome=True
 	        shift 1
 	        ;;
