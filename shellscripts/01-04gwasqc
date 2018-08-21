@@ -124,7 +124,7 @@ echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --missing --out $
 #call rate distribution check
 #2 fitlers out based on genotyping threshold
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --make-bed --out "${OutputDir}"/QCStep2/QCStep2
-echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --make-bed --out ${OutputDir}/QCStep2/QCStep2" > "${OutputDir}"/QCStep2/command.txt
+echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --geno ${GenotypingThreshold:=$GenotypingThresholdDefault} --make-bed --out ${OutputDir}/QCStep2/QCStep2" > "${OutputDir}"/QCStep2/command.txt
 #3 For validation of missingness threshold and call rate distribution check
 plink --bfile "${OutputDir}"/QCStep2/QCStep2 --missing --out "${OutputDir}"/QCStep3/QCStep3
 echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --missing --out ${OutputDir}/QCStep3/QCStep3" > "${OutputDir}"/QCStep3/command.txt
