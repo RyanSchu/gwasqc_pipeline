@@ -48,5 +48,20 @@ allexclude2 <- hetoutliers
 write.table(allexclude2, file = args$QCdir %&% "/QCStep5/QCStep5c/QCStep5c.txt", quote = F, col.names = F, row.names = F)
 
 
-count <- paste(dim(hetoutliers)[1], "individuals to remove")
+newsortHET <- neHET[order(HET$F),]
+newoutliers <- data.frame()
+
+for(i in 1:length(newsortHET$F)){
+  if(newsortHET[i,6] > (mean(newsortHET$F)+3*sd(newsortHET$F))){
+    newoutliers <- rbind(newoutliers, newsortHET[i,])
+  }
+  if(newsortHET[i,6] < (mean(newsortHET$F)-3*sd(newsortHET$F))){
+   new outliers <- rbind(newoutliers, newsortHET[i,])
+  }
+}
+newhetoutliers <- select(outliers, FID, IID)
+dim(newhetoutliers)
+newallexclude2 <- newhetoutliers
+write.table(newallexclude2, file = args$QCdir %&% "/QCStep5/QCStep5e/QCStep5e.txt", quote = F, col.names = F, row.names = F)
+count <- paste(dim(newhetoutliers)[1], "to remove after filtering")
 write(count, hetstats, append=T)
