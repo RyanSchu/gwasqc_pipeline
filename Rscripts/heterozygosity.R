@@ -56,7 +56,7 @@ for(i in 1:length(newsortHET$F)){
     newoutliers <- rbind(newoutliers, newsortHET[i,])
   }
   if(newsortHET[i,6] < (mean(newsortHET$F)-3*sd(newsortHET$F))){
-   new outliers <- rbind(newoutliers, newsortHET[i,])
+   newoutliers <- rbind(newoutliers, newsortHET[i,])
   }
 }
 newhetoutliers <- select(outliers, FID, IID)
