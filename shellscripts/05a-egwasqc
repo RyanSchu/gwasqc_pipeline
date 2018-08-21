@@ -1,5 +1,5 @@
 #!/bin/bash
-
+BfileDefault=~/QC/QCStep2/QCStep2 
 OutputDirDefault=~/QC
 RelatednessDefault=0.25
 while :
