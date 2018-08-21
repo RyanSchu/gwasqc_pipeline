@@ -48,7 +48,7 @@ allexclude2 <- hetoutliers
 write.table(allexclude2, file = args$QCdir %&% "/QCStep5/QCStep5c/QCStep5c.txt", quote = F, col.names = F, row.names = F)
 
 
-newsortHET <- newHET[order(HET$F),]
+newsortHET <- newHET[order(newHET$F),]
 newoutliers <- data.frame()
 
 for(i in 1:length(newsortHET$F)){
