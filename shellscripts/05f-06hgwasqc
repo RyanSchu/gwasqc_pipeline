@@ -1,6 +1,11 @@
 #!/bin/bash
-
+BfileDefault=~/QC/QCStep5/QCStep5f/QCStep5f
+GenotypingThresholdDefault=0.01
+HapMapDirDefault=/home/wheelerlab2/Data/HAPMAP3_hg19/
+HapMapTagDefault=HM3_ASN_CEU_YRI_Unrelated_hg19_noAmbig
+MafDefault=0.05
 OutputDirDefault=~/QC
+PCADefault=10
 while :
 do
     case "$1" in
@@ -16,13 +21,34 @@ do
       	 	BedFile="$2"
 	        shift 2
 	        ;;
+      -gt | --genothreshold) #threshold to filter geotyping rate by
+      	  	GenotypingThreshold="$2"
+	        shift 2
+	        ;;
       --fam) #/path/to/file.fam
       		FamFile="$2"
 	        shift 2
 	        ;;
+      -h | --hapmap) #/path/to/hapmapdirectory
+      		HapMapDir="$2"
+	        shift 2
+	        ;;
+      --maf) #minor allele frequency threshold
+         	Maf="$2"
+	        shift 2
+		;;
       -o | --output) #directory where you'd like to send all your QC folders - will be folder hierarchy
          	Outputdir="$2"
 	        shift 2
+		;;
+      -pca) #directory where you'd like to send all your QC folders - will be folder hierarchy
+         	PCA="$2"
+	        shift 2
+		;;
+      -rm | --removerelateds) #Takes true or false, false is default
+         	Outputdir="$2"
+	        shift 2
+		;;
       -*) #unknown 
       	  echo "Error: Unknown option: $1" >&2
 	        exit 1
@@ -34,14 +60,58 @@ do
      esac
 done
 
-echo "Using QC steps located in ${OutputDir:=$OutputDirDefault}"
+echo "Using bim file ${BimFile:=${BFile:=$BfileDefault}.bim}"
+echo "Using bed file ${BedFile:=${BFile:=$BfileDefault}.bed}"
+echo "Using fam file ${FamFile:=${BFile:=$BfileDefault}.fam}"
+echo "Using Output Directory ${OutputDir:=$OutputDirDefault}"
+echo "Using hapmap files located in ${HapMapDir:=$HapMapDirDefault}"
+
 if [ ! -d "${OutputDir}"/QCStep5 ]
 then
   echo "Warning: relatedness filtering does not exist. Please run 05a-e4gwasqc and try again. Exiting."
   exit 1
 fi
 
+if [ ! -e "${BimFile}" ] || [ ! -e "${FamFile}" ] || [ ! -e "${BedFile}" ]
+then
+  echo "Warning: One or more input files does not exist. Exiting."
+  exit 1
+fi
 
+if [ ! -e "${HapMapDir}"/*.bim ] || [ ! -e "${HapMapDir}"/*.bed ] || [ ! -e "${HapMapDir}"/*.fam ] || [ ! -d "${HapMapDir}" ]
+then
+	echo "Warning: Could not find files necessary for hapmap merge. Exiting."
+	exit 1
+fi
 
+if [ ! -d "${OutputDir}"/hapmap ]
+then
+	mkdir "${OutputDir}"/hapmap
+fi
 
+if [ ! -d "${OutputDir}"/PCA ]
+then
+	mkdir "${OutputDir}"/PCA
+fi
+
+#5f create new bfiles based on whatever relatedness threshold you decided in part e (by default)
+#will also just accept the input of a bfile for hapmap merging
+plink --bfile /home/angela/px_yri_chol/QC/QCStep5/QCStep5d/QCStep5d --remove /home/angela/px_yri_chol/QC/QCStep5/QCStep5e/QCStep5e.txt --make-bed --out "${OutputDir}"/QCStep5/QCStep5f/QCStep5f
+
+#Liftover if necessary
+
+#6a Hapmap merge
+plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --bmerge "${HapMapDir}"/*.bed "${HapMapDir}"/*.bim "${HapMapDir}"/*.fam --make-bed --out "${OutputDir}"/hapmap/primarymerge
+
+#6b create new hapmap files without the missing snps
+plink --bed "${HapMapDir}"/*.bed  --bim "${HapMapDir}"/*.bim --fam "${HapMapDir}"/*.fam --exclude "${OutputDir}"/hapmap/primarymerge-merge.missnp --make-bed --out "${OutputDir}"/hapmap/hapmap_withoutmissing
+ 
+#6c Hapmap merge again without missing snps
+plink --bfile "${OutputDir}"/QCStep5/QCStep5f/QCStep5f --bmerge "${OutputDir}"/hapmap/hapmap_withoutmissing.bed "${OutputDir}"/hapmap/hapmap_withoutmissing.bim "${OutputDir}"/hapmap/hapmap_withoutmissing.fam --make-bed --out "${OutputDir}"/hapmap/final_withoutmissing
+ 
+#6d Filter merged file to SNPs with >90% genotypes
+plink --bfile "${OutputDir}"/hapmap/final_withoutmissing --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=MafDefault}" --make-bed --out "${OutputDir}"/hapmap/final_withoutmissing_filtered
+
+#6e Run PCA
+plink --bfile "${OutputDir}"/hapmap/final_withoutmissing_filtered --pca "${PCA:=PCADefault}"  header --out "${OutputDir}"/PCA/pca
 
