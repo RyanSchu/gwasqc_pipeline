@@ -83,6 +83,11 @@ then
 	exit 1
 fi
 
+if [ ! -d "${OutputDir}"/QCStep5/QCStep5f ]
+then
+	mkdir "${OutputDir}"/QCStep5/QCStep5f
+fi
+
 if [ ! -d "${OutputDir}"/hapmap ]
 then
 	mkdir "${OutputDir}"/hapmap
@@ -96,7 +101,7 @@ fi
 
 #5f create new bfiles based on whatever relatedness threshold you decided in part e (by default)
 #will also just accept the input of a bfile for hapmap merging
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove /home/angela/px_yri_chol/QC/QCStep5/QCStep5e/QCStep5e.txt --make-bed --out "${OutputDir}"/QCStep5/QCStep5f/QCStep5f
+plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${OutputDir}"/QCStep5/QCStep5e/QCStep5e.txt --make-bed --out "${OutputDir}"/QCStep5/QCStep5f/QCStep5f
 
 #Liftover if necessary
 
@@ -110,8 +115,8 @@ plink --bed "${HapMapDir}"/*.bed  --bim "${HapMapDir}"/*.bim --fam "${HapMapDir}
 plink --bfile "${OutputDir}"/QCStep5/QCStep5f/QCStep5f --bmerge "${OutputDir}"/hapmap/hapmap_withoutmissing.bed "${OutputDir}"/hapmap/hapmap_withoutmissing.bim "${OutputDir}"/hapmap/hapmap_withoutmissing.fam --make-bed --out "${OutputDir}"/hapmap/final_withoutmissing
  
 #6d Filter merged file to SNPs with >90% genotypes
-plink --bfile "${OutputDir}"/hapmap/final_withoutmissing --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=MafDefault}" --make-bed --out "${OutputDir}"/hapmap/final_withoutmissing_filtered
+plink --bfile "${OutputDir}"/hapmap/final_withoutmissing --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --make-bed --out "${OutputDir}"/hapmap/final_withoutmissing_filtered
 
 #6e Run PCA
-plink --bfile "${OutputDir}"/hapmap/final_withoutmissing_filtered --pca "${PCA:=PCADefault}"  header --out "${OutputDir}"/PCA/pca
+plink --bfile "${OutputDir}"/hapmap/final_withoutmissing_filtered --pca "${PCA:=$PCADefault}"  header --out "${OutputDir}"/PCA/pca
 
