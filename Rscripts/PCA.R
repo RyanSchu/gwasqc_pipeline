@@ -21,11 +21,11 @@ colnames(fam) <- c("FID","IID")
 popinfo <- left_join(fam,hapmappopinfo,by="IID")
 popinfo <- mutate(popinfo, pop=ifelse(is.na(pop),'GWAS', as.character(pop)))
 table(popinfo$pop)
-pcs <- read.table((args$QCdir %&% "/PCA/pca.eigenvec",skip=1)
+pcs <- read.table((args$vec,skip=1)
 pcdf <- data.frame(popinfo, pcs[,2:11]) %>% rename (PC1=V2,PC2=V3,PC3=V4,PC4=V5,PC5=V6,PC6=V7,PC7=V8,PC8=V9,PC9=V10,PC10=V11)
 gwas <- filter(pcdf,pop=='GWAS')
 hm3 <- filter(pcdf, grepl('NA',IID))
-eval <- scan(args$QCdir %&% "/PCA/pca.eigenval")[1:10]
+eval <- scan(args$val)[1:10]
 round(eval/sum(eval),3)
 
 
