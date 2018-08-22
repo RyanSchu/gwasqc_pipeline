@@ -1,8 +1,7 @@
 #!/bin/bash
-BfileDefault=~/QC/QCStep5/QCStep5f/QCStep5f
+BfileDefault=~/QC/QCStep5/QCStep5d/QCStep5d
 GenotypingThresholdDefault=0.01
 HapMapDirDefault=/home/wheelerlab2/Data/HAPMAP3_hg19/
-HapMapTagDefault=HM3_ASN_CEU_YRI_Unrelated_hg19_noAmbig
 MafDefault=0.05
 OutputDirDefault=~/QC
 PCADefault=10
@@ -94,14 +93,15 @@ then
 	mkdir "${OutputDir}"/PCA
 fi
 
+
 #5f create new bfiles based on whatever relatedness threshold you decided in part e (by default)
 #will also just accept the input of a bfile for hapmap merging
-plink --bfile /home/angela/px_yri_chol/QC/QCStep5/QCStep5d/QCStep5d --remove /home/angela/px_yri_chol/QC/QCStep5/QCStep5e/QCStep5e.txt --make-bed --out "${OutputDir}"/QCStep5/QCStep5f/QCStep5f
+plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove /home/angela/px_yri_chol/QC/QCStep5/QCStep5e/QCStep5e.txt --make-bed --out "${OutputDir}"/QCStep5/QCStep5f/QCStep5f
 
 #Liftover if necessary
 
 #6a Hapmap merge
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --bmerge "${HapMapDir}"/*.bed "${HapMapDir}"/*.bim "${HapMapDir}"/*.fam --make-bed --out "${OutputDir}"/hapmap/primarymerge
+plink --bfile "${OutputDir}"/QCStep5/QCStep5f/QCStep5f --bmerge "${HapMapDir}"/*.bed "${HapMapDir}"/*.bim "${HapMapDir}"/*.fam --make-bed --out "${OutputDir}"/hapmap/primarymerge
 
 #6b create new hapmap files without the missing snps
 plink --bed "${HapMapDir}"/*.bed  --bim "${HapMapDir}"/*.bim --fam "${HapMapDir}"/*.fam --exclude "${OutputDir}"/hapmap/primarymerge-merge.missnp --make-bed --out "${OutputDir}"/hapmap/hapmap_withoutmissing
