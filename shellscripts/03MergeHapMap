@@ -120,5 +120,5 @@ plink --bfile "${OutputDir}"/hapmap/final_withoutmissing --geno "${GenotypingThr
 #6e Run PCA
 plink --bfile "${OutputDir}"/hapmap/final_withoutmissing_filtered --pca "${PCA:=$PCADefault}"  header --out "${OutputDir}"/PCA/pca
 
-Rscript PCA.R -h "${HapMapDir}" --val "${OutputDir}"/PCA/pca.eigenval --vec "${OutputDir}"/PCA/pca.eigenvec --QCdir "${OutputDir}"
+Rscript ~/gwasqc_pipeline/Rscripts/PCA.R -h "${HapMapDir}" --val "${OutputDir}"/PCA/pca.eigenval --vec "${OutputDir}"/PCA/pca.eigenvec --QCdir "${OutputDir}"
 
