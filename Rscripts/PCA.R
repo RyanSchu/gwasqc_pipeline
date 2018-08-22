@@ -32,15 +32,12 @@ round(eval/sum(eval),3)
 pdf(args$QCdir %&% "PCA/pca_plots.pdf")
 #PCA Plot 1 (PC1 vs PC2)
 ggplot() + geom_point(data=gwas,aes(x=PC1,y=PC2,col=pop,shape=pop))+geom_point(data=hm3,aes(x=PC1,y=PC2,col=pop,shape=pop))+ theme_bw() + scale_colour_brewer(palette="Set1") + ggtitle("PC1 vs PC2")
-	##Output in /home/angela/px_yri_chol/QC/QC_Plots/PC_Plots/PCA-1.pdf
 
 #PCA Plot 2 (PC1 vs PC3)
 ggplot() + geom_point(data=gwas,aes(x=PC1,y=PC3,col=pop,shape=pop))+geom_point(data=hm3,aes(x=PC1,y=PC3,col=pop,shape=pop))+ theme_bw() + scale_colour_brewer(palette="Set1") + ggtitle("PC1 vs PC3")
-  ##Output in /home/angela/px_yri_chol/QC/QC_Plots/PC_Plots/PCA-2.pdf
 
 #PCA Plot 1 (PC2 vs PC3)
 ggplot() + geom_point(data=gwas,aes(x=PC2,y=PC3,col=pop,shape=pop))+geom_point(data=hm3,aes(x=PC2,y=PC3,col=pop,shape=pop))+ theme_bw() + scale_colour_brewer(palette="Set1") + ggtitle("PC2 vs PC3")
-	##Output in /home/angela/px_yri_chol/QC/QC_Plots/PC_Plots/PCA-3.pdf
 
 #PCA with HAPMAP populations
 yri <- filter(pcdf,pop=='YRI')
@@ -65,7 +62,7 @@ dim(gwas)[1]-dim(samples)[1]
 ggplot() + geom_point(data=gwas,aes(x=PC1,y=PC2,col=gwas$IID %in% samples$IID,shape=gwas$IID %in% samples$IID))+geom_point(data=hm3,aes(x=PC1,y=PC2,col=pop,shape=pop))+ theme_bw()
 
 dev.off() 
-write.table(samples,"/home/angela/px_yri_chol/QC/QC_Plots/PC_Plots/GWAS_PCA.txt",quote=F,row.names=F,col.names=F)
+write.table(samples, args$QCdir %&% "/PCA/GWAS_PCA.txt",quote=F,row.names=F,col.names=F)
 
 #afrpcs <- read.table("/home/angela/px_yri_chol/QC/QCStep6/QCStep6e/QCStep6e.evec",skip=1)
 #afrcdf <- afrpcs %>% rename(PC1=V2,PC2=V3,PC3=V4,PC4=V5,PC5=V6,PC6=V7,PC7=V8,PC8=V9,PC9=V10,PC10=V11) %>% mutate(pop=ifelse(grepl("TC",V1),"GWAS","GWAS"))
