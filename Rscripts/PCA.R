@@ -29,7 +29,7 @@ eval <- scan(args$val)[1:10]
 round(eval/sum(eval),3)
 
 
-pdf(args$QCdir %&% "PCA/pca_plots.pdf")
+pdf(args$QCdir %&% "/PCA/pca_plots.pdf")
 #PCA Plot 1 (PC1 vs PC2)
 ggplot() + geom_point(data=gwas,aes(x=PC1,y=PC2,col=pop,shape=pop))+geom_point(data=hm3,aes(x=PC1,y=PC2,col=pop,shape=pop))+ theme_bw() + scale_colour_brewer(palette="Set1") + ggtitle("PC1 vs PC2")
 
