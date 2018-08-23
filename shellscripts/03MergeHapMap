@@ -20,12 +20,12 @@ do
       	 	BedFile="$2"
 	        shift 2
 	        ;;
-      -gt | --genothreshold) #threshold to filter geotyping rate by
-      	  	GenotypingThreshold="$2"
-	        shift 2
-	        ;;
       --fam) #/path/to/file.fam
       		FamFile="$2"
+	        shift 2
+	        ;;
+     -gt | --genothreshold) #threshold to filter genotyping rate by
+      	  	GenotypingThreshold="$2"
 	        shift 2
 	        ;;
       -h | --hapmap) #/path/to/hapmapdirectory
@@ -40,12 +40,8 @@ do
          	Outputdir="$2"
 	        shift 2
 		;;
-      -pca) #directory where you'd like to send all your QC folders - will be folder hierarchy
+      -pca) #How many principle components you would like to calculate
          	PCA="$2"
-	        shift 2
-		;;
-      -rm | --removerelateds) #Takes true or false, false is default
-         	Outputdir="$2"
 	        shift 2
 		;;
       -*) #unknown 
