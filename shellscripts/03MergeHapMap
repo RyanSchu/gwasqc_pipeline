@@ -1,4 +1,5 @@
 #!/bin/bash
+AffymetrixAnnotationsDefault=~/GenomeWideSNP_6.na35.annot.csv
 BfileDefault=~/QC/QCStep5/QCStep5d/QCStep5d
 GenotypingThresholdDefault=0.01
 HapMapDirDefault=/home/wheelerlab2/Data/HAPMAP3_hg19/
@@ -8,6 +9,10 @@ PCADefault=10
 while :
 do
     case "$1" in
+      -a | --affymetrix) #same as normal plink - Path to all files and the shared prefix
+	        AffymetrixAnnotations="$2"  
+	        shift 2
+	        ;;
       -b | --bfile) #same as normal plink - Path to all files and the shared prefix
 	        BFile="$2"  
 	        shift 2
@@ -100,6 +105,8 @@ fi
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${OutputDir}"/QCStep5/QCStep5e/QCStep5e.txt --make-bed --out "${OutputDir}"/QCStep5/QCStep5f/QCStep5f
 
 #Liftover if necessary
+#Translate SNP from Affy to rsid if necessary
+Rscript  ~/gwasqc_pipeline/Rscripts/AffyToRsid.R --bim   "${OutputDir}"/QCStep5/QCStep5f/QCStep5f --csv "${AffymetrixAnnotations:=$AffymetrixAnnotationsDefault}"
 
 #6a Hapmap merge
 plink --bfile "${OutputDir}"/QCStep5/QCStep5f/QCStep5f --bmerge "${HapMapDir}"/*.bed "${HapMapDir}"/*.bim "${HapMapDir}"/*.fam --make-bed --out "${OutputDir}"/hapmap/primarymerge
