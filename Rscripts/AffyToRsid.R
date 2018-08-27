@@ -15,6 +15,7 @@ csv<-read.table(args$csv, header = T, skip = 18, sep = ',')
 bim<-read.table(args$bim, sep = '\t')
 bim<- left_join(bim, csv, by = c('V2' = 'Probe.Set.ID'))
 newbim<- select(bim, c('V1', 'dbSNP.RS.ID', 'V3', 'V4', 'V5', 'V6' ))
+newbim<- newbim[!grepl("---", newbim$dbSNP.RS.ID),]
 newbim<- na.omit(newbim)
 
 write.table(x= newbim, file = args$bim, quote = F, row.names = F,col.names = F)
