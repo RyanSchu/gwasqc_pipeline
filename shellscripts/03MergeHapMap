@@ -2,7 +2,7 @@
 AffymetrixAnnotationsDefault=~/GenomeWideSNP_6.na35.annot.csv
 BfileDefault=~/QC/QCStep5/QCStep5d/QCStep5d
 GenotypingThresholdDefault=0.01
-HapMapDirDefault=/home/wheelerlab2/Data/HAPMAP3_hg19/
+HapMapDirDefault=/home/wheelerlab2/Data/HAPMAP3_hg18/
 MafDefault=0.05
 OutputDirDefault=~/QC
 PCADefault=10
