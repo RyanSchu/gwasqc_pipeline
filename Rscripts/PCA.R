@@ -7,37 +7,41 @@ parser <- ArgumentParser()
 parser$add_argument("--hapmapdir", help="directory where all the hapmap files are written")
 parser$add_argument("--val",help="full path to eigenvalue file")
 parser$add_argument("--vec",help="full path to eigenvector file")
-parser$add_argument("--QCdir", help="directory where all the QC steps are written")
+parser$add_argument("--fam", help="full path to the fam file youd like to use")
+parser$add_argument("--outputdir", help="directory where you would like to output your plots")
 args <- parser$parse_args()
-
 "%&%" = function(a,b) paste (a,b,sep="")
 
-pcaplots <- args$QCdir %&% "PCA/pca_plots.pdf"
+pcaplots <- args$outputdir %&% "/pca_plots.pdf"
 
-hapmappopinfo <- read.table(args$hapmapdir %&% "/pop_HM3_hg19_forPCA.txt") %>% select (V1,V3)
+hapmappopinfo <- read.table(args$hapmapdir %&% "/pop_HM3_hg18_forPCA.txt") %>% select (V1,V3)
 colnames(hapmappopinfo) <- c("pop","IID")
-fam <- read.table(args$QCdir %&% "/hapmap/final_withoutmissing_filtered.fam") %>% select (V1,V2)
+fam <- read.table(args$fam) %>% select (V1,V2)
 colnames(fam) <- c("FID","IID")
 popinfo <- left_join(fam,hapmappopinfo,by="IID")
 popinfo <- mutate(popinfo, pop=ifelse(is.na(pop),'GWAS', as.character(pop)))
 table(popinfo$pop)
-pcs <- read.table(args$vec,skip=1)
-pcdf <- data.frame(popinfo, pcs[,2:ncol(pcs)]) %>% rename (PC1=V2,PC2=V3,PC3=V4)
+pcs <- read.table(args$vec,header=T)
+pcdf <- data.frame(popinfo, pcs[,3:ncol(pcs)])
 gwas <- filter(pcdf,pop=='GWAS')
 hm3 <- filter(pcdf, grepl('NA',IID))
 eval <- scan(args$val)[1:10]
-round(eval/sum(eval),3)
+skree<-round(eval/sum(eval),3)
+skree<-cbind.data.frame(skree,c(1,2,3,4,5,6,7,8,9,10))
+colnames(skree)<-c("percent_var", "PC")
 
+pdf(pcaplots)
 
-pdf(args$QCdir %&% "/PCA/pca_plots.pdf")
+ggplot(data=skree, aes(x=PC, y=percent_var)) + geom_point() + geom_line() + scale_x_continuous(breaks = 1:10) + ggtitle("Proportion of variance explained")
+
 #PCA Plot 1 (PC1 vs PC2)
-ggplot() + geom_point(data=gwas,aes(x=as.numeric(PC1),y=PC2,col=pop,shape=pop))+geom_point(data=hm3,aes(x=PC1,y=PC2,col=pop,shape=pop))+ theme_bw() + scale_colour_brewer(palette="Set1") + ggtitle("PC1 vs PC2")
+ggplot() + geom_point(data=pcdf,aes(x=PC1,y=PC2,col=pop,shape=pop)) + theme_bw() + scale_colour_brewer(palette="Set1") + ggtitle("PC1 vs PC2")
 
 #PCA Plot 2 (PC1 vs PC3)
-ggplot() + geom_point(data=gwas,aes(x=PC1,y=PC3,col=pop,shape=pop))+geom_point(data=hm3,aes(x=PC1,y=PC3,col=pop,shape=pop))+ theme_bw() + scale_colour_brewer(palette="Set1") + ggtitle("PC1 vs PC3")
+ggplot() + geom_point(data=pcdf,aes(x=PC1,y=PC3,col=pop,shape=pop)) + theme_bw() + scale_colour_brewer(palette="Set1") + ggtitle("PC1 vs PC3")
 
 #PCA Plot 1 (PC2 vs PC3)
-ggplot() + geom_point(data=gwas,aes(x=PC2,y=PC3,col=pop,shape=pop))+geom_point(data=hm3,aes(x=PC2,y=PC3,col=pop,shape=pop))+ theme_bw() + scale_colour_brewer(palette="Set1") + ggtitle("PC2 vs PC3")
+ggplot() + geom_point(data=pcdf,aes(x=PC2,y=PC3,col=pop,shape=pop)) + theme_bw() + scale_colour_brewer(palette="Set1") + ggtitle("PC2 vs PC3")
 
 #PCA with HAPMAP populations
 yri <- filter(pcdf,pop=='YRI')
