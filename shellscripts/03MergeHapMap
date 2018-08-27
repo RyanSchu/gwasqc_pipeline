@@ -106,7 +106,7 @@ plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${Outpu
 
 #Liftover if necessary
 #Translate SNP from Affy to rsid if necessary
-Rscript  ~/gwasqc_pipeline/Rscripts/AffyToRsid.R --bim   "${OutputDir}"/QCStep5/QCStep5f/QCStep5f --csv "${AffymetrixAnnotations:=$AffymetrixAnnotationsDefault}"
+Rscript  ~/gwasqc_pipeline/Rscripts/AffyToRsid.R --bim   "${OutputDir}"/QCStep5/QCStep5f/QCStep5f.bim --csv "${AffymetrixAnnotations:=$AffymetrixAnnotationsDefault}"
 
 #6a Hapmap merge
 plink --bfile "${OutputDir}"/QCStep5/QCStep5f/QCStep5f --bmerge "${HapMapDir}"/*.bed "${HapMapDir}"/*.bim "${HapMapDir}"/*.fam --make-bed --out "${OutputDir}"/hapmap/primarymerge
