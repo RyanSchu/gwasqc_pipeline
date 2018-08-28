@@ -6,11 +6,13 @@ HapMapDirDefault=/home/wheelerlab2/Data/HAPMAP3_hg18/
 MafDefault=0.05
 OutputDirDefault=~/QC
 PCADefault=10
+RunAffeyDefault=F
 while :
 do
     case "$1" in
       -a | --affymetrix) #same as normal plink - Path to all files and the shared prefix
 	        AffymetrixAnnotations="$2"  
+	        RunAffy=T
 	        shift 2
 	        ;;
       -b | --bfile) #same as normal plink - Path to all files and the shared prefix
@@ -105,8 +107,11 @@ fi
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${OutputDir}"/QCStep5/QCStep5e/QCStep5e.txt --make-bed --out "${OutputDir}"/QCStep5/QCStep5f/QCStep5f
 
 #Liftover if necessary
+if [ "${RunAffey:=RunAffeyDefault}" = T ] && [ -e "${AffymetrixAnnotations:?Affy annotation dne}" ]
+then
 #Translate SNP from Affy to rsid if necessary
-Rscript  ~/gwasqc_pipeline/Rscripts/AffyToRsid.R --bim   "${OutputDir}"/QCStep5/QCStep5f/QCStep5f.bim --csv "${AffymetrixAnnotations:=$AffymetrixAnnotationsDefault}"
+	Rscript  ~/gwasqc_pipeline/Rscripts/AffyToRsid.R --bim   "${OutputDir}"/QCStep5/QCStep5f/QCStep5f.bim --csv "${AffymetrixAnnotations:=$AffymetrixAnnotationsDefault}"
+fi
 
 #6a Hapmap merge
 plink --bfile "${OutputDir}"/QCStep5/QCStep5f/QCStep5f --bmerge "${HapMapDir}"/*.bed "${HapMapDir}"/*.bim "${HapMapDir}"/*.fam --make-bed --out "${OutputDir}"/hapmap/primarymerge
