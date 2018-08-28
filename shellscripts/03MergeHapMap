@@ -139,5 +139,5 @@ plink --bfile "${OutputDir}"/hapmap/05final_autosome --extract "${OutputDir}"/ha
 #6h Run PCA
 plink --bfile "${OutputDir}"/hapmap/07final_LDpruned --pca "${PCA:=$PCADefault}"  header --out "${OutputDir}"/PCA/pca
 
-Rscript ~/gwasqc_pipeline/Rscripts/PCA.R --hapmapdir "${HapMapDir}" --val "${OutputDir}"/PCA/pca.eigenval --vec "${OutputDir}"/PCA/pca.eigenvec --fam "${OutputDir}"/hapmap/06final_LDpruned.fam --outputdir "${OutputDir}"/PCA/
+Rscript ~/gwasqc_pipeline/Rscripts/PCA.R --hapmapdir "${HapMapDir}" --val "${OutputDir}"/PCA/pca.eigenval --vec "${OutputDir}"/PCA/pca.eigenvec --fam "${OutputDir}"/hapmap/07final_LDpruned.fam --outputdir "${OutputDir}"/PCA/
 
