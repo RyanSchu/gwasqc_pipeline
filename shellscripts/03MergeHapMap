@@ -135,7 +135,7 @@ plink --bfile "${OutputDir}"/hapmap/04final_geno --autosome --make-bed --out "${
 #6f Creat list of LD pruned snps
 plink --bfile "${OutputDir}"/hapmap/05final_autosome --indep-pairwise 50 5 0.3 --out "${OutputDir}"/hapmap/06final_LDprune_list
 #6g extract LD pruned snps
-plink --bfile "${OutputDir}"/hapmap/05final_autosome --extract "${OutputDir}"/hapmap/06final_LDprune_list --out "${OutputDir}"/hapmap/07final_LDpruned
+plink --bfile "${OutputDir}"/hapmap/05final_autosome --extract "${OutputDir}"/hapmap/06final_LDprune_list --make-bed --out "${OutputDir}"/hapmap/07final_LDpruned
 #6h Run PCA
 plink --bfile "${OutputDir}"/hapmap/06final_LDpruned --pca "${PCA:=$PCADefault}"  header --out "${OutputDir}"/PCA/pca
 
