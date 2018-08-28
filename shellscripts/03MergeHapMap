@@ -6,7 +6,7 @@ HapMapDirDefault=/home/wheelerlab2/Data/HAPMAP3_hg18/
 MafDefault=0.05
 OutputDirDefault=~/QC
 PCADefault=10
-RunAffeyDefault=F
+RunAffyDefault=F
 while :
 do
     case "$1" in
@@ -107,7 +107,7 @@ fi
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${OutputDir}"/QCStep5/QCStep5e/QCStep5e.txt --make-bed --out "${OutputDir}"/QCStep5/QCStep5f/QCStep5f
 
 #Liftover if necessary
-if [ "${RunAffey:=RunAffeyDefault}" = T ] && [ -e "${AffymetrixAnnotations:?Affy annotation dne}" ]
+if [ "${RunAffy:=RunAffyDefault}" = T ] && [ -e "${AffymetrixAnnotations:?Affy annotation dne}" ]
 then
 #Translate SNP from Affy to rsid if necessary
 	Rscript  ~/gwasqc_pipeline/Rscripts/AffyToRsid.R --bim   "${OutputDir}"/QCStep5/QCStep5f/QCStep5f.bim --csv "${AffymetrixAnnotations:=$AffymetrixAnnotationsDefault}"
