@@ -1,5 +1,6 @@
 #!/bin/bash
 AffymetrixAnnotationsDefault=~/GenomeWideSNP_6.na35.annot.csv
+AutosomeDefault=False
 BfileDefault=~/QC/QCStep5/QCStep5d/QCStep5d
 GenotypingThresholdDefault=0.01
 HapMapDirDefault=/home/wheelerlab2/Data/HAPMAP3_hg18/
@@ -10,10 +11,14 @@ RunAffyDefault=F
 while :
 do
     case "$1" in
-      -a | --affymetrix) #same as normal plink - Path to all files and the shared prefix
+      --affy) #same as normal plink - Path to all files and the shared prefix
 	        AffymetrixAnnotations="$2"  
 	        RunAffy=T
 	        shift 2
+	        ;;
+      -a | --autosome) #flag for filtering by autosome
+	        Autosome=True
+	        shift 1
 	        ;;
       -b | --bfile) #same as normal plink - Path to all files and the shared prefix
 	        BFile="$2"  
@@ -114,19 +119,24 @@ then
 fi
 
 #6a Hapmap merge
-plink --bfile "${OutputDir}"/QCStep5/QCStep5f/QCStep5f --bmerge "${HapMapDir}"/*.bed "${HapMapDir}"/*.bim "${HapMapDir}"/*.fam --make-bed --out "${OutputDir}"/hapmap/primarymerge
+plink --bfile "${OutputDir}"/QCStep5/QCStep5f/QCStep5f --bmerge "${HapMapDir}"/*.bed "${HapMapDir}"/*.bim "${HapMapDir}"/*.fam --make-bed --out "${OutputDir}"/hapmap/01primarymerge
+
 
 #6b create new hapmap files without the missing snps
-plink --bed "${HapMapDir}"/*.bed  --bim "${HapMapDir}"/*.bim --fam "${HapMapDir}"/*.fam --exclude "${OutputDir}"/hapmap/primarymerge-merge.missnp --make-bed --out "${OutputDir}"/hapmap/hapmap_withoutmissing
+plink --bed "${HapMapDir}"/*.bed  --bim "${HapMapDir}"/*.bim --fam "${HapMapDir}"/*.fam --exclude "${OutputDir}"/hapmap/01primarymerge-merge.missnp --make-bed --out "${OutputDir}"/hapmap/02hapmap_withoutmissing
  
 #6c Hapmap merge again without missing snps
-plink --bfile "${OutputDir}"/QCStep5/QCStep5f/QCStep5f --bmerge "${OutputDir}"/hapmap/hapmap_withoutmissing.bed "${OutputDir}"/hapmap/hapmap_withoutmissing.bim "${OutputDir}"/hapmap/hapmap_withoutmissing.fam --make-bed --out "${OutputDir}"/hapmap/final_withoutmissing
+plink --bfile "${OutputDir}"/QCStep5/QCStep5f/QCStep5f --bmerge "${OutputDir}"/hapmap/02hapmap_withoutmissing.bed "${OutputDir}"/hapmap/02hapmap_withoutmissing.bim "${OutputDir}"/hapmap/02hapmap_withoutmissing.fam --make-bed --out "${OutputDir}"/hapmap/03final_withoutmissing
  
 #6d Filter merged file to SNPs with >90% genotypes
-plink --bfile "${OutputDir}"/hapmap/final_withoutmissing --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --make-bed --out "${OutputDir}"/hapmap/final_withoutmissing_filtered
+plink --bfile "${OutputDir}"/hapmap/03final_withoutmissing --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --make-bed --out "${OutputDir}"/hapmap/04final_geno
+#6e filter by autosome
+plink --bfile "${OutputDir}"/hapmap/04final_geno --autosome --make-bed --out "${OutputDir}"/hapmap/05final_autosome
+#6f filter by LD pruning
+plink --bfile "${OutputDir}"/hapmap/05final_autosome --indep-pairwise 50 5 0.3 --out "${OutputDir}"/hapmap/06final_LDpruned
 
 #6e Run PCA
-plink --bfile "${OutputDir}"/hapmap/final_withoutmissing_filtered --pca "${PCA:=$PCADefault}"  header --out "${OutputDir}"/PCA/pca
+plink --bfile "${OutputDir}"/hapmap/06final_LDpruned --pca "${PCA:=$PCADefault}"  header --out "${OutputDir}"/PCA/pca
 
-Rscript ~/gwasqc_pipeline/Rscripts/PCA.R --hapmapdir "${HapMapDir}" --val "${OutputDir}"/PCA/pca.eigenval --vec "${OutputDir}"/PCA/pca.eigenvec --QCdir "${OutputDir}"
+Rscript ~/gwasqc_pipeline/Rscripts/PCA.R --hapmapdir "${HapMapDir}" --val "${OutputDir}"/PCA/pca.eigenval --vec "${OutputDir}"/PCA/pca.eigenvec --fam "${OutputDir}"/hapmap/06final_LDpruned.fam --outputdir "${OutputDir}"/PCA/
 
