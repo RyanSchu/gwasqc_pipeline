@@ -132,10 +132,11 @@ plink --bfile "${OutputDir}"/QCStep5/QCStep5f/QCStep5f --bmerge "${OutputDir}"/h
 plink --bfile "${OutputDir}"/hapmap/03final_withoutmissing --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --make-bed --out "${OutputDir}"/hapmap/04final_geno
 #6e filter by autosome
 plink --bfile "${OutputDir}"/hapmap/04final_geno --autosome --make-bed --out "${OutputDir}"/hapmap/05final_autosome
-#6f filter by LD pruning
-plink --bfile "${OutputDir}"/hapmap/05final_autosome --indep-pairwise 50 5 0.3 --out "${OutputDir}"/hapmap/06final_LDpruned
-
-#6e Run PCA
+#6f Creat list of LD pruned snps
+plink --bfile "${OutputDir}"/hapmap/05final_autosome --indep-pairwise 50 5 0.3 --out "${OutputDir}"/hapmap/06final_LDprune_list
+#6g extract LD pruned snps
+plink --bfile "${OutputDir}"/hapmap/05final_autosome --extract "${OutputDir}"/hapmap/06final_LDprune_list --out "${OutputDir}"/hapmap/07final_LDpruned
+#6h Run PCA
 plink --bfile "${OutputDir}"/hapmap/06final_LDpruned --pca "${PCA:=$PCADefault}"  header --out "${OutputDir}"/PCA/pca
 
 Rscript ~/gwasqc_pipeline/Rscripts/PCA.R --hapmapdir "${HapMapDir}" --val "${OutputDir}"/PCA/pca.eigenval --vec "${OutputDir}"/PCA/pca.eigenvec --fam "${OutputDir}"/hapmap/06final_LDpruned.fam --outputdir "${OutputDir}"/PCA/
