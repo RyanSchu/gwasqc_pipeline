@@ -4,6 +4,7 @@ library(ggplot2)
 library(argparse)
 
 parser <- ArgumentParser()
+parser$add_argument("--pihat", help="inbreeding coefficient to filter by")
 parser$add_argument("--QCdir", help="directory where all the QC steps are written")
 args <- parser$parse_args()
 
@@ -36,4 +37,4 @@ dev.off()
 #sortOthers <- others[order(others$PI_HAT, decreasing = TRUE),]
 ##Unexpected duplicates:
 #filter(others,PI_HAT>=0.2)
-write.table(filter(others,PI_HAT>=0.25), args$QCdir %&% "/QCstats/related.to.remove.txt", quote = FALSE, row.names = FALSE)
+write.table(filter(others,PI_HAT>=args$pihat), args$QCdir %&% "/QCstats/related.to.remove.txt", quote = FALSE, row.names = FALSE)
