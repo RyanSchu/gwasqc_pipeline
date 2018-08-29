@@ -115,21 +115,18 @@ fi
 #6a Hapmap merge
 plink --bfile "${OutputDir}"/QCStep5/QCStep5f/QCStep5f --bmerge "${HapMapDir}"/*.bed "${HapMapDir}"/*.bim "${HapMapDir}"/*.fam --make-bed --out "${OutputDir}"/hapmap/01primarymerge
 
-
 #6b create new hapmap files without the missing snps
 plink --bed "${HapMapDir}"/*.bed  --bim "${HapMapDir}"/*.bim --fam "${HapMapDir}"/*.fam --exclude "${OutputDir}"/hapmap/01primarymerge-merge.missnp --make-bed --out "${OutputDir}"/hapmap/02hapmap_withoutmissing
  
 #6c Hapmap merge again without missing snps
-plink --bfile "${OutputDir}"/QCStep5/QCStep5f/QCStep5f --bmerge "${OutputDir}"/hapmap/02hapmap_withoutmissing.bed "${OutputDir}"/hapmap/02hapmap_withoutmissing.bim "${OutputDir}"/hapmap/02hapmap_withoutmissing.fam --make-bed --out "${OutputDir}"/hapmap/03final_withoutmissing
+plink --bfile "${OutputDir}"/QCStep5/QCStep5f/QCStep5f --bmerge "${OutputDir}"/hapmap/02hapmap_withoutmissing.bed "${OutputDir}"/hapmap/02hapmap_withoutmissing.bim "${OutputDir}"/hapmap/02hapmap_withoutmissing.fam --make-bed --out "${OutputDir}"/hapmap/03Withoutmissing
  
 #6d Filter merged file to SNPs with >90% genotypes
-plink --bfile "${OutputDir}"/hapmap/03final_withoutmissing --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --make-bed --out "${OutputDir}"/hapmap/04final_geno
-#6e filter by autosome
-plink --bfile "${OutputDir}"/hapmap/04final_geno --autosome --make-bed --out "${OutputDir}"/hapmap/05final_autosome
-#6f Creat list of LD pruned snps
-plink --bfile "${OutputDir}"/hapmap/05final_autosome --indep-pairwise 50 5 0.3 --out "${OutputDir}"/hapmap/06final_LDprune_list
+plink --bfile "${OutputDir}"/hapmap/03Withoutmissing --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/"04Without_missing_geno${GenotypingThreshold}_noX"
+#6e Creat list of LD pruned snps
+plink --bfile "${OutputDir}"/hapmap/"04Without_missing_geno${GenotypingThreshold}_noX" --indep-pairwise 50 5 0.3 --out "${OutputDir}"/hapmap/05LD_prune_list
 #6g extract LD pruned snps
-plink --bfile "${OutputDir}"/hapmap/05final_autosome --extract "${OutputDir}"/hapmap/06final_LDprune_list.prune.in --make-bed --out "${OutputDir}"/hapmap/07final_LDpruned
+plink --bfile "${OutputDir}"/hapmap/"04Without_missing_geno${GenotypingThreshold}_noX" --extract "${OutputDir}"/hapmap/05LD_prune_list.prune.in --make-bed --out "${OutputDir}"/hapmap/07final_LDpruned
 #6h Run PCA
 plink --bfile "${OutputDir}"/hapmap/07final_LDpruned --pca "${PCA:=$PCADefault}"  header --out "${OutputDir}"/PCA/pca
 
