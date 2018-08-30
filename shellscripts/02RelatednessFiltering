@@ -69,7 +69,7 @@ echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --indep-pairwise 
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/QCStep5/QCStep5a/QCStep5a.prune.in --genome --min "${Relatedness:=$RelatednessDefault}" --out "${OutputDir}"/QCStep5/QCStep5b/QCstep5b
 echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --extract ${OutputDir}/QCStep5/QCStep5a/QCStep5a.prune.in --genome --min ${Relatedness:=$RelatednessDefault} --out ${OutputDir}/QCStep5/QCStep5b/QCstep5b" > "${OutputDir}"/QCStep5/QCStep5b/command.txt
 
-Rscript ~/gwasqc_pipeline/Rscripts/ibd.R --QCdir "${OutputDir}" --pihat "${Relatedness:=$RelatednessDefault}" #generate list of related samples and duplicates for removal
+Rscript ~/gwasqc_pipeline/Rscripts/ibd.R -o "${OutputDir}"/QCstats --pihat "${Relatedness:=$RelatednessDefault}" --genome ${OutputDir}/QCStep5/QCStep5b/QCstep5b.genome #generate list of related samples and duplicates for removal
 
 #5c heterozygosity check for unfiltered samples 
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --het --out "${OutputDir}"/QCStep5/QCStep5c/QCStep5c
