@@ -4,11 +4,11 @@ library(ggplot2)
 library(argparse)
 
 parser <- ArgumentParser()
-parser$add_argument("--hapmapdir", help="directory where all the hapmap files are written")
+parser$add_argument("-h", "--hapmapdir", help="directory where all the hapmap files are written")
 parser$add_argument("--val",help="full path to eigenvalue file")
 parser$add_argument("--vec",help="full path to eigenvector file")
 parser$add_argument("--fam", help="full path to the fam file youd like to use")
-parser$add_argument("--outputdir", help="directory where you would like to output your plots")
+parser$add_argument("-o", "--outputdir", help="directory where you would like to output your plots")
 args <- parser$parse_args()
 "%&%" = function(a,b) paste (a,b,sep="")
 
