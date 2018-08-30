@@ -122,13 +122,13 @@ plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --missing --out "
 #2 fitlers out based on genotyping threshold
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_filtered"
 #3 For validation of missingness threshold and call rate distribution check
-plink --bfile "${OutputDir}"/QCStep2/QCStep2 --missing --out "${OutputDir}"/missingness_hwe_steps/03missingness_validation
+plink --bfile "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_filtered" --missing --out "${OutputDir}"/missingness_hwe_steps/03missingness_validation
 #call rate distribution validation
 
 Rscript ~/gwasqc_pipeline/Rscripts/CallRateDistribution.R -t "${GenotypingThreshold}" --QCdir "${OutputDir}"
 
 #4 for later calculating HWE statistics
-plink --bfile "${OutputDir}"/QCStep2/QCStep2 --hardy --out "${OutputDir}"/missingness_hwe_steps/04initial_HWE_stats
+plink --bfile "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_filtered" --hardy --out "${OutputDir}"/missingness_hwe_steps/04initial_HWE_stats
 #calculate HWE statistics prefiltering
 Rscript ~/gwasqc_pipeline/Rscripts/hwe.R --hwe "${OutputDir}"/missingness_hwe_steps/04initial_HWE_stats.hwe -o "${OutputDir}"/plots_stats/ -t initial
 
