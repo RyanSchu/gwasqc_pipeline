@@ -136,7 +136,7 @@ Rscript ~/gwasqc_pipeline/Rscripts/hwe.R --hwe "${OutputDir}"/missingness_hwe_st
 plink --bfile "${OutputDir}"/QCStep2/QCStep2 --hwe "${HWEpval:=$HWEpvalDefault}" midp --make-bed --out "${OutputDir}"/missingness_hwe_steps/05filtered_HWE
 plink --bfile "${OutputDir}"/QCStep2/QCStep2 --hardy --out "${OutputDir}"/missingness_hwe_steps/05filtered_HWE
 
-Rscript ~/gwasqc_pipeline/Rscripts/hwe.R --hwe "${OutputDir}"/missingness_hwe_steps/05filtered_HWE -o "${OutputDir}"/plots_stats/ -t filtered
+Rscript ~/gwasqc_pipeline/Rscripts/hwe.R --hwe "${OutputDir}"/missingness_hwe_steps/05filtered_HWE.hwe -o "${OutputDir}"/plots_stats/ -t filtered
 
 
 
