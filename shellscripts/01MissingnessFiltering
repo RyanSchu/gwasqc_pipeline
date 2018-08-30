@@ -130,13 +130,13 @@ Rscript ~/gwasqc_pipeline/Rscripts/CallRateDistribution.R -t "${GenotypingThresh
 #4 for later calculating HWE statistics
 plink --bfile "${OutputDir}"/QCStep2/QCStep2 --hardy --out "${OutputDir}"/missingness_hwe_steps/04initial_HWE_stats
 #calculate HWE statistics prefiltering
-Rscript ~/gwasqc_pipeline/Rscripts/hwe.R -h "${OutputDir}"/missingness_hwe_steps/04initial_HWE_stats.hwe -o "${OutputDir}"/plots_stats/ -t initial
+Rscript ~/gwasqc_pipeline/Rscripts/hwe.R --hwe "${OutputDir}"/missingness_hwe_steps/04initial_HWE_stats.hwe -o "${OutputDir}"/plots_stats/ -t initial
 
 #5 Filter by HWE threshold and recalculate staistics
 plink --bfile "${OutputDir}"/QCStep2/QCStep2 --hwe "${HWEpval:=$HWEpvalDefault}" midp --make-bed --out "${OutputDir}"/missingness_hwe_steps/05filtered_HWE
 plink --bfile "${OutputDir}"/QCStep2/QCStep2 --hardy --out "${OutputDir}"/missingness_hwe_steps/05filtered_HWE
 
-Rscript ~/gwasqc_pipeline/Rscripts/hwe.R -h "${OutputDir}"/missingness_hwe_steps/05filtered_HWE -o "${OutputDir}"/plots_stats/ -t filtered
+Rscript ~/gwasqc_pipeline/Rscripts/hwe.R --hwe "${OutputDir}"/missingness_hwe_steps/05filtered_HWE -o "${OutputDir}"/plots_stats/ -t filtered
 
 
 
