@@ -3,7 +3,7 @@
 AutosomeDefault=False
 BfileDefault=/home/wheelerlab2/Data/MESA_dbGaP_55081/phg000071.v2.NHLBI_SHARE_MESA.genotype-calls-matrixfmt.c1/SHARE_MESA_c1
 GenotypingThresholdDefault=0.01
-HWEpvalDefault=1e-30
+HWEpvalDefault=0.0001
 OutputDirDefault=~/QC
 PrefilterDefault=none
 
@@ -35,7 +35,7 @@ do
 	        Prefilter=keep
 		shift 2
 	        ;;
-      -g | --genothreshold) #threshold to filter genotyping rate by
+      -g | --geno) #threshold to filter genotyping rate by
       	  	GenotypingThreshold="$2"
 	        shift 2
 	        ;;
@@ -76,72 +76,67 @@ fi
 if [ ! -d "${OutputDir:=$OutputDirDefault}" ]
 then
   mkdir "${OutputDir}"
-  mkdir "${OutputDir}"/QCstats
-  mkdir "${OutputDir}"/QCStep1
-  mkdir "${OutputDir}"/QCStep2
-  mkdir "${OutputDir}"/QCStep3
-  mkdir "${OutputDir}"/QCStep4
-  mkdir "${OutputDir}"/QCStep5
-  mkdir "${OutputDir}"/QCStep5/QCStep5a
-  mkdir "${OutputDir}"/QCStep5/QCStep5b
-  mkdir "${OutputDir}"/QCStep5/QCStep5c
-  mkdir "${OutputDir}"/QCStep5/QCStep5d
-  mkdir "${OutputDir}"/QCStep5/QCStep5e
+  mkdir "${OutputDir}"/plots_stats
+  mkdir "${OutputDir}"/hapmap
+  mkdir "${OutputDir}"/missingness_hwe_steps
+  mkdir "${OutputDir}"/relatedness_steps
 fi
 
 #0 Optional prefiltering step for sample selection and for autosomal filtering
 case "${Autosome:=$AutosomeDefault}:${Prefilter:=$PrefilterDefault}" in
 	True:keep)
-		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --autosome --make-bed --out "${OutputDir}"/QCstep0
-		BedFile="${OutputDir}"/QCstep0.bed
-		BimFile="${OutputDir}"/QCstep0.bim
-		FamFile="${OutputDir}"/QCstep0.fam
+		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --autosome --make-bed --out "${OutputDir}"/missingness_hwe_steps/00autosome_k
+		BedFile="${OutputDir}"/missingness_hwe_steps/00autosome_k.bed
+		BimFile="${OutputDir}"/missingness_hwe_steps/00autosome_k.bim
+		FamFile="${OutputDir}"/missingness_hwe_steps/00autosome_k.fam
 		;;
 	True:remove)
-		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --autosome --make-bed --out "${OutputDir}"/QCstep0
-		BedFile="${OutputDir}"/QCstep0.bed
-		BimFile="${OutputDir}"/QCstep0.bim
-		FamFile="${OutputDir}"/QCstep0.fam
+		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --autosome --make-bed --out "${OutputDir}"/missingness_hwe_steps/00autosome_r
+		BedFile="${OutputDir}"/missingness_hwe_steps/00autosome_r.bed
+		BimFile="${OutputDir}"/missingness_hwe_steps/00autosome_r.bim
+		FamFile="${OutputDir}"/missingness_hwe_steps/00autosome_r.fam
 		;;
 	True:none)
-		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --autosome --make-bed --out "${OutputDir}"/QCstep0
-		BedFile="${OutputDir}"/QCstep0.bed
-		BimFile="${OutputDir}"/QCstep0.bim
-		FamFile="${OutputDir}"/QCstep0.fam
+		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --autosome --make-bed --out "${OutputDir}"/missingness_hwe_steps/00autosome
+		BedFile="${OutputDir}"/missingness_hwe_steps/00autosome.bed
+		BimFile="${OutputDir}"/missingness_hwe_steps/00autosome.bim
+		FamFile="${OutputDir}"/missingness_hwe_steps/00autosome.fam
 		;;
 	False:keep)
-		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --make-bed --out "${OutputDir}"/QCstep0
-		BedFile="${OutputDir}"/QCstep0.bed
-		BimFile="${OutputDir}"/QCstep0.bim
-		FamFile="${OutputDir}"/QCstep0.fam
+		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/00filt_k
+		BedFile="${OutputDir}"/missingness_hwe_steps/00filt_k.bed
+		BimFile="${OutputDir}"/missingness_hwe_steps/00filt_k.bim
+		FamFile="${OutputDir}"/missingness_hwe_steps/00filt_k.fam
 		;;
 	False:remove)
-		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --make-bed --out "${OutputDir}"/QCstep0
-		BedFile="${OutputDir}"/QCstep0.bed
-		BimFile="${OutputDir}"/QCstep0.bim
-		FamFile="${OutputDir}"/QCstep0.fam
+		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/00filt_r
+		BedFile="${OutputDir}"/missingness_hwe_steps/00filt_r.bed
+		BimFile="${OutputDir}"/missingness_hwe_steps/00filt_r.bim
+		FamFile="${OutputDir}"/missingness_hwe_steps/00filt_r.fam
 		;;
 esac
 
 #1 for determining genotyping threshold
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --missing --out "${OutputDir}"/QCStep1/QCStep1
-echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --missing --out ${OutputDir}/QCStep1/QCStep1" > "${OutputDir}"/QCStep1/command.txt
+plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --missing --out "${OutputDir}"/missingness_hwe_steps/01initial_missingness
 #call rate distribution check
 #2 fitlers out based on genotyping threshold
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --make-bed --out "${OutputDir}"/QCStep2/QCStep2
-echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --geno ${GenotypingThreshold:=$GenotypingThresholdDefault} --make-bed --out ${OutputDir}/QCStep2/QCStep2" > "${OutputDir}"/QCStep2/command.txt
+plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_filtered"
 #3 For validation of missingness threshold and call rate distribution check
-plink --bfile "${OutputDir}"/QCStep2/QCStep2 --missing --out "${OutputDir}"/QCStep3/QCStep3
-echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --missing --out ${OutputDir}/QCStep3/QCStep3" > "${OutputDir}"/QCStep3/command.txt
+plink --bfile "${OutputDir}"/QCStep2/QCStep2 --missing --out "${OutputDir}"/missingness_hwe_steps/03missingness_validation
 #call rate distribution validation
 
 Rscript ~/gwasqc_pipeline/Rscripts/CallRateDistribution.R -t "${GenotypingThreshold}" --QCdir "${OutputDir}"
 
 #4 for later calculating HWE statistics
-plink --bfile "${OutputDir}"/QCStep2/QCStep2 --hardy --hwe "${HWEpval:=$HWEpvalDefault}" midp --make-bed --out "${OutputDir}"/QCStep4/QCStep4
-echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --hardy --out ${OutputDir}/QCStep4/QCStep4" > "${OutputDir}"/QCStep4/command.txt
-#calculate HWE statistics
+plink --bfile "${OutputDir}"/QCStep2/QCStep2 --hardy --out "${OutputDir}"/missingness_hwe_steps/04initial_HWE_stats
+#calculate HWE statistics prefiltering
+Rscript ~/gwasqc_pipeline/Rscripts/hwe.R -h "${OutputDir}"/missingness_hwe_steps/04initial_HWE_stats.hwe -o "${OutputDir}"/plots_stats/ -t initial
 
-Rscript ~/gwasqc_pipeline/Rscripts/hwe.R --QCdir "${OutputDir}"
+#5 Filter by HWE threshold and recalculate staistics
+plink --bfile "${OutputDir}"/QCStep2/QCStep2 --hwe "${HWEpval:=$HWEpvalDefault}" midp --make-bed --out "${OutputDir}"/missingness_hwe_steps/05filtered_HWE
+plink --bfile "${OutputDir}"/QCStep2/QCStep2 --hardy --out "${OutputDir}"/missingness_hwe_steps/05filtered_HWE
+
+Rscript ~/gwasqc_pipeline/Rscripts/hwe.R -h "${OutputDir}"/missingness_hwe_steps/05filtered_HWE -o "${OutputDir}"/plots_stats/ -t filtered
+
 
 
