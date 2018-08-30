@@ -3,6 +3,7 @@
 AutosomeDefault=False
 BfileDefault=/home/wheelerlab2/Data/MESA_dbGaP_55081/phg000071.v2.NHLBI_SHARE_MESA.genotype-calls-matrixfmt.c1/SHARE_MESA_c1
 GenotypingThresholdDefault=0.01
+HWEpvalDefault=1e-30
 OutputDirDefault=~/QC
 PrefilterDefault=none
 
@@ -34,8 +35,12 @@ do
 	        Prefilter=keep
 		shift 2
 	        ;;
-      -gt | --genothreshold) #threshold to filter geotyping rate by
+      -g | --genothreshold) #threshold to filter genotyping rate by
       	  	GenotypingThreshold="$2"
+	        shift 2
+	        ;;
+      -h | --hwe) #threshold for filtering by hardy weinburg statistics
+      	  	HWEpval="$2"
 	        shift 2
 	        ;;
       -o | --output) #directory where you'd like to send all your QC folders - will be folder hierarchy
@@ -133,7 +138,7 @@ echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --missing --out ${OutputDir}/QC
 Rscript ~/gwasqc_pipeline/Rscripts/CallRateDistribution.R -t "${GenotypingThreshold}" --QCdir "${OutputDir}"
 
 #4 for later calculating HWE statistics
-plink --bfile "${OutputDir}"/QCStep2/QCStep2 --hardy --out "${OutputDir}"/QCStep4/QCStep4
+plink --bfile "${OutputDir}"/QCStep2/QCStep2 --hardy --hwe "${HWEpval:=$HWEpvalDefault}" midp --make-bed --out "${OutputDir}"/QCStep4/QCStep4
 echo "plink --bfile ${OutputDir}/QCStep2/QCStep2 --hardy --out ${OutputDir}/QCStep4/QCStep4" > "${OutputDir}"/QCStep4/command.txt
 #calculate HWE statistics
 
