@@ -1,5 +1,5 @@
 #!/bin/bash
-BfileDefault=~/QC/QCStep2/QCStep2 
+BfileDefault=~/QC/missingness_hwe_steps/05filtered_HWE
 OutputDirDefault=~/QC
 RelatednessDefault=0.25
 while :
@@ -45,40 +45,30 @@ echo "Using bed file ${BedFile:=${BFile:=$BfileDefault}.bed}"
 echo "Using fam file ${FamFile:=${BFile:=$BfileDefault}.fam}"
 echo "Using Output Directory ${OutputDir:=$OutputDirDefault}"
 
-
-if [ ! -d "${OutputDir}" ]
+if [ ! -e "${BimFile}" ] || [ ! -e "${FamFile}" ] || [ ! -e "${BedFile}" ]
 then
-  echo "Warning: Missingness filtering does not exist. Please run 01-04gwas and try again. Exiting."
+  echo "Warning: One or more bfiles does not exist. Exiting."
   exit 1
 fi
 
-if [ ! -d "${OutputDir}"/QCStep5 ]
+if [ ! -d "${OutputDir}"/relatedness_steps ]
 then
-  mkdir "${OutputDir}"/QCStep5
-  mkdir "${OutputDir}"/QCStep5/QCStep5a
-  mkdir "${OutputDir}"/QCStep5/QCSteo5b
-  mkdir "${OutputDir}"/QCStep5/QCSteo5c
-  mkdir "${OutputDir}"/QCStep5/QCSteo5d
-  mkdir "${OutputDir}"/QCStep5/QCSteo5e
+  mkdir "${OutputDir}"/relatedness_steps
 fi
 
 #5a Creates a pruned list of SNP IDs for plotting on a principal components analysis
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --indep-pairwise 50 5 0.3 --out "${OutputDir}"/QCStep5/QCStep5a/QCStep5a
-echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --indep-pairwise 50 5 0.3 --out ${OutputDir}/QCStep5/QCStep5a/QCStep5a" > "${OutputDir}"/QCStep5/QCStep5a/command.txt
+plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --indep-pairwise 50 5 0.3 --out "${OutputDir}"/relatedness_steps/01LD_prune_list
 #5b Determine the relatednesss of samples
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/QCStep5/QCStep5a/QCStep5a.prune.in --genome --min "${Relatedness:=$RelatednessDefault}" --out "${OutputDir}"/QCStep5/QCStep5b/QCstep5b
-echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --extract ${OutputDir}/QCStep5/QCStep5a/QCStep5a.prune.in --genome --min ${Relatedness:=$RelatednessDefault} --out ${OutputDir}/QCStep5/QCStep5b/QCstep5b" > "${OutputDir}"/QCStep5/QCStep5b/command.txt
+plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/relatedness_steps/01LD_prune_list.prune.in --genome --min "${Relatedness:=$RelatednessDefault}" --out "${OutputDir}"/relatedness_steps/02relatedness
 #generate list of samples to remove based on relatedness
-Rscript ~/gwasqc_pipeline/Rscripts/ibd.R -o "${OutputDir}"/QCstats --pihat "${Relatedness:=$RelatednessDefault}" --genome ${OutputDir}/QCStep5/QCStep5b/QCstep5b.genome #generate list of related samples and duplicates for removal
+Rscript ~/gwasqc_pipeline/Rscripts/ibd.R -o "${OutputDir}"/plots_stats --pihat "${Relatedness:=$RelatednessDefault}" --genome ${OutputDir}/relatedness_steps/02relatedness.genome #generate list of related samples and duplicates for removal
 
 #5c heterozygosity check for unfiltered samples 
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --het --out "${OutputDir}"/QCStep5/QCStep5c/QCStep5c
-echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --het --out ${OutputDir}/QCStep5/QCStep5c/QCStep5c" > "${OutputDir}"/QCStep5/QCStep5c/command.txt
+plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --het --out "${OutputDir}"/relatedness_steps/03het_unfiltered
 #5d filter out related individuals and duplicates
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/QCStep5/QCStep5a/QCStep5a.prune.in --remove "${OutputDir}"/QCstats/related.to.remove.txt --make-bed --out "${OutputDir}"/QCStep5/QCStep5d/QCStep5d
-echo "plink --bed ${BedFile} --bim ${BimFile} --fam ${FamFile} --extract ${OutputDir}/QCStep5/QCStep5a/QCStep5a.prune.in --remove ${OutputDir}/QCstats/related.to.remove.txt --make-bed --out ${OutputDir}/QCStep5/QCStep5d/QCStep5d" > "${OutputDir}"/QCStep5/QCStep5d/command.txt
+plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/relatedness_steps/01LD_prune_list.prune.in --remove "${OutputDir}"/plots_stats/related.to.remove.txt --make-bed --out "${OutputDir}"/relatedness_steps/"04without_relateds_${Relatedness}"
 #5e regenerate heterozygosity estimates from filtered for validation
-plink --bfile "${OutputDir}"/QCStep5/QCStep5d/QCStep5d --het --out "${OutputDir}"/QCStep5/QCStep5e/QCStep5e
+plink --bfile "${OutputDir}"/relatedness_steps/"04without_relateds_${Relatedness}" --het --out "${OutputDir}"/relatedness_steps/"05het_without_relateds_${Relatedness}"
 
 Rscript ~/gwasqc_pipeline/Rscripts/heterozygosity.R --QCdir "${OutputDir}" -r "${Relatedness}"
 
