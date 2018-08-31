@@ -13,19 +13,19 @@ args <- parser$parse_args()
 percentage<-100*(1-args$threshold)
 
 #read in files
-lmiss <- read.table(args$QCdir %&% "/QCStep1/QCStep1.lmiss", header=T)
-imiss <- read.table(args$QCdir %&% "/QCStep3/QCStep3.imiss", header = T)
-newlmiss <- read.table(args$QCdir %&% "/QCStep3/QCStep3.lmiss", header = T)
+lmiss <- read.table(args$QCdir %&% "/missingness_hwe_steps/01initial_missingness.lmiss", header=T)
+imiss <- read.table(args$QCdir %&% "/missingness_hwe_steps/03missingness_validation.imiss", header = T)
+newlmiss <- read.table(args$QCdir %&% "/missingness_hwe_steps/03missingness_validation.lmiss", header = T)
 
 #create histogram's of missingness before and after filtering
-pdf(args$QCdir %&% "/QCstats/callRateDistributions.pdf")
+pdf(args$QCdir %&% "/plots_stats/callRateDistributions.pdf")
 hist(lmiss$F_MISS, main="Call rate distribution for SNPs before filtering")
 hist(newlmiss$F_MISS, main="distributions for SNPs after removing SNPs call rate < " %&% percentage)
 hist(imiss$F_MISS, main="distributions for individuals after removing SNPs call rate < " %&% percentage)
 dev.off()
 
 #stats
-statsfile<- args$QCdir %&% "/QCstats/missingness.txt"
+statsfile<- args$QCdir %&% "/plots_stats/missingness.txt"
 #Initial SNP count, SNP count after filtering, individual count after filtering
 init<- "Initial number of SNPs is " %&% dim(lmiss)[1]
 final<- paste("Number of SNPs after filtering with out call rates < ", percentage, " is ", dim(newlmiss)[1], sep="")
