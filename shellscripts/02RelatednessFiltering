@@ -1,7 +1,7 @@
 #!/bin/bash
 BfileDefault=~/QC/missingness_hwe_steps/05filtered_HWE
 OutputDirDefault=~/QC
-RelatednessDefault=0.25
+RelatednessDefault=1
 while :
 do
     case "$1" in
@@ -65,10 +65,14 @@ Rscript ~/gwasqc_pipeline/Rscripts/ibd.R -o "${OutputDir}"/plots_stats --pihat "
 
 #5c heterozygosity check for unfiltered samples 
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --het --out "${OutputDir}"/relatedness_steps/03het_unfiltered
-#5d filter out related individuals and duplicates
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/relatedness_steps/01LD_prune_list.prune.in --remove "${OutputDir}"/plots_stats/related.to.remove.txt --make-bed --out "${OutputDir}"/relatedness_steps/04without_relateds
-#5e regenerate heterozygosity estimates from filtered for validation
-plink --bfile "${OutputDir}"/relatedness_steps/04without_relateds --het --out "${OutputDir}"/relatedness_steps/05het_without_relateds
+#5d LD prune snps from bfiles
+plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/relatedness_steps/01LD_prune_list.prune.in  --make-bed --out "${OutputDir}"/relatedness_steps/04LD_pruned
 
+if [ -e "${OutputDir}"/plots_stats/related.to.remove.txt ] && [ "${Relatedness}" -ne 1 ]
+then
+	plink --bfile "${OutputDir}"/relatedness_steps/04LD_pruned --remove "${OutputDir}"/plots_stats/related.to.remove.txt --make-bed --out "${OutputDir}"/relatedness_steps/05without_relateds
+	#5e regenerate heterozygosity estimates from filtered for validation
+	plink --bfile "${OutputDir}"/relatedness_steps/05without_relateds --het --out "${OutputDir}"/relatedness_steps/06het_without_relateds
+fi
 Rscript ~/gwasqc_pipeline/Rscripts/heterozygosity.R -o "${OutputDir}"/plots_stats -r "${Relatedness}" --filteredhet "${OutputDir}"/relatedness_steps/05het_without_relateds.het --unfilteredhet "${OutputDir}"/relatedness_steps/03het_unfiltered.het
 
