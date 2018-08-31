@@ -70,5 +70,5 @@ plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${Outp
 #5e regenerate heterozygosity estimates from filtered for validation
 plink --bfile "${OutputDir}"/relatedness_steps/"04without_relateds_${Relatedness}" --het --out "${OutputDir}"/relatedness_steps/"05het_without_relateds_${Relatedness}"
 
-Rscript ~/gwasqc_pipeline/Rscripts/heterozygosity.R -o "${OutputDir}"/plots_stats -r "${Relatedness}" --filteredhet "${OutputDir}"/relatedness_steps/"05het_without_relateds_${Relatedness}.het --unfilteredhet "${OutputDir}"/relatedness_steps/03het_unfiltered.het
+Rscript ~/gwasqc_pipeline/Rscripts/heterozygosity.R -o "${OutputDir}"/plots_stats -r "${Relatedness}" --filteredhet "${OutputDir}"/relatedness_steps/"05het_without_relateds_${Relatedness}.het" --unfilteredhet "${OutputDir}"/relatedness_steps/03het_unfiltered.het
 
