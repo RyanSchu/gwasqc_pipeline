@@ -6,7 +6,6 @@ library(argparse)
 parser <- ArgumentParser()
 parser$add_argument("--bim", help="full path to the bim file you would like to translate")
 parser$add_argument("--csv",help="full path to file containing the Affy SNPs with corresponding rsids")
-parser$add_argument("--QCdir", help="directory where all the QC steps are written")
 args <- parser$parse_args()
 
 "%&%" = function(a,b) paste (a,b,sep="")
