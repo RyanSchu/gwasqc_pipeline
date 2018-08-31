@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #AffymetrixAnnotationsDefault=~/GenomeWideSNP_6.na35.annot.csv
 AutosomeDefault=False
 BfileDefault=~/QC/relatedness_steps/04without_relateds
@@ -7,7 +8,9 @@ HapMapDirDefault=/home/wheelerlab2/Data/HAPMAP3_hg18/
 MafDefault=0.05
 OutputDirDefault=~/QC
 PCADefault=10
+PrefilterDefault=none
 RunAffyDefault=F
+
 while :
 do
     case "$1" in
@@ -36,7 +39,7 @@ do
       		FamFile="$2"
 	        shift 2
 	        ;;
-     -g | --geno) #threshold to filter genotyping rate by
+      -g | --geno) #threshold to filter genotyping rate by
       	  	GenotypingThreshold="$2"
 	        shift 2
 	        ;;
@@ -56,6 +59,11 @@ do
          	PCA="$2"
 	        shift 2
 		;;
+      -r | --remove) #list of individuals you would like to remove
+      	  	RemoveList="$2"
+		Prefilter=remove
+	        shift 2
+	        ;;
       -*) #unknown 
       	  echo "Error: Unknown option: $1" >&2
 	        exit 1
@@ -85,11 +93,6 @@ then
 	exit 1
 fi
 
-if [ ! -d "${OutputDir}"/QCStep5/QCStep5f ]
-then
-	mkdir "${OutputDir}"/QCStep5/QCStep5f
-fi
-
 if [ ! -d "${OutputDir}"/hapmap ]
 then
 	mkdir "${OutputDir}"/hapmap
@@ -101,19 +104,24 @@ then
 fi
 
 
-#5f create new bfiles based on whatever relatedness threshold you decided in part e (by default)
-#will also just accept the input of a bfile for hapmap merging
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${OutputDir}"/QCStep5/QCStep5e/QCStep5e.txt --make-bed --out "${OutputDir}"/QCStep5/QCStep5f/QCStep5f
+#If you would like to remove outliers from relatedness do so here
+if [ "${Prefilter}" = "remove" ] 
+then
+	plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --make-bed --out "${OutputDir}"/hapmap/00remove_outliers
+	BedFile="${OutputDir}"/hapmap/00remove_outliers.bed
+	BimFile="${OutputDir}"/hapmap/00remove_outliers.bim
+	FamFile="${OutputDir}"/hapmap/00remove_outliers.fam
+fi
 
 #Liftover if necessary
+#Translate SNP from Affy to rsid if necessary
 if [ "${RunAffy:=RunAffyDefault}" = T ] && [ -e "${AffymetrixAnnotations:?Affy annotation dne}" ]
 then
-#Translate SNP from Affy to rsid if necessary
 	Rscript  ~/gwasqc_pipeline/Rscripts/AffyToRsid.R --bim   "${OutputDir}"/QCStep5/QCStep5f/QCStep5f.bim --csv "${AffymetrixAnnotations:=$AffymetrixAnnotationsDefault}"
 fi
 
 #6a Hapmap merge
-plink --bfile "${OutputDir}"/QCStep5/QCStep5f/QCStep5f --bmerge "${HapMapDir}"/*.bed "${HapMapDir}"/*.bim "${HapMapDir}"/*.fam --make-bed --out "${OutputDir}"/hapmap/01primarymerge
+plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --bmerge "${HapMapDir}"/*.bed "${HapMapDir}"/*.bim "${HapMapDir}"/*.fam --make-bed --out "${OutputDir}"/hapmap/01primarymerge
 
 #6b create new hapmap files without the missing snps
 plink --bed "${HapMapDir}"/*.bed  --bim "${HapMapDir}"/*.bim --fam "${HapMapDir}"/*.fam --exclude "${OutputDir}"/hapmap/01primarymerge-merge.missnp --make-bed --out "${OutputDir}"/hapmap/02hapmap_withoutmissing
