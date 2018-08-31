@@ -66,9 +66,9 @@ Rscript ~/gwasqc_pipeline/Rscripts/ibd.R -o "${OutputDir}"/plots_stats --pihat "
 #5c heterozygosity check for unfiltered samples 
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --het --out "${OutputDir}"/relatedness_steps/03het_unfiltered
 #5d filter out related individuals and duplicates
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/relatedness_steps/01LD_prune_list.prune.in --remove "${OutputDir}"/plots_stats/related.to.remove.txt --make-bed --out "${OutputDir}"/relatedness_steps/"04without_relateds_${Relatedness}"
+plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/relatedness_steps/01LD_prune_list.prune.in --remove "${OutputDir}"/plots_stats/related.to.remove.txt --make-bed --out "${OutputDir}"/relatedness_steps/04without_relateds
 #5e regenerate heterozygosity estimates from filtered for validation
-plink --bfile "${OutputDir}"/relatedness_steps/"04without_relateds_${Relatedness}" --het --out "${OutputDir}"/relatedness_steps/"05het_without_relateds_${Relatedness}"
+plink --bfile "${OutputDir}"/relatedness_steps/"04without_relateds_${Relatedness}" --het --out "${OutputDir}"/relatedness_steps/05het_without_relateds
 
-Rscript ~/gwasqc_pipeline/Rscripts/heterozygosity.R -o "${OutputDir}"/plots_stats -r "${Relatedness}" --filteredhet "${OutputDir}"/relatedness_steps/"05het_without_relateds_${Relatedness}.het" --unfilteredhet "${OutputDir}"/relatedness_steps/03het_unfiltered.het
+Rscript ~/gwasqc_pipeline/Rscripts/heterozygosity.R -o "${OutputDir}"/plots_stats -r "${Relatedness}" --filteredhet "${OutputDir}"/relatedness_steps/05het_without_relateds.het --unfilteredhet "${OutputDir}"/relatedness_steps/03het_unfiltered.het
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 #AffymetrixAnnotationsDefault=~/GenomeWideSNP_6.na35.annot.csv
 AutosomeDefault=False
-BfileDefault=~/QC/QCStep5/QCStep5d/QCStep5d
+BfileDefault=~/QC/relatedness_steps/04without_relateds
 GenotypingThresholdDefault=0.01
 HapMapDirDefault=/home/wheelerlab2/Data/HAPMAP3_hg18/
 MafDefault=0.05
