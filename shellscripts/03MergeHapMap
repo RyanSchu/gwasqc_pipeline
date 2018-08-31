@@ -1,5 +1,5 @@
 #!/bin/bash
-AffymetrixAnnotationsDefault=~/GenomeWideSNP_6.na35.annot.csv
+#AffymetrixAnnotationsDefault=~/GenomeWideSNP_6.na35.annot.csv
 AutosomeDefault=False
 BfileDefault=~/QC/QCStep5/QCStep5d/QCStep5d
 GenotypingThresholdDefault=0.01
@@ -16,10 +16,10 @@ do
 	        RunAffy=T
 	        shift 2
 	        ;;
-      -a | --autosome) #flag for filtering by autosome
-	        Autosome=True
-	        shift 1
-	        ;;
+     # -a | --autosome) #flag for filtering by autosome
+	#        Autosome=True
+	 #       shift 1
+	  #      ;;
       -b | --bfile) #same as normal plink - Path to all files and the shared prefix
 	        BFile="$2"  
 	        shift 2
@@ -36,7 +36,7 @@ do
       		FamFile="$2"
 	        shift 2
 	        ;;
-     -gt | --genothreshold) #threshold to filter genotyping rate by
+     -g | --geno) #threshold to filter genotyping rate by
       	  	GenotypingThreshold="$2"
 	        shift 2
 	        ;;
