@@ -67,9 +67,9 @@ Rscript ~/gwasqc_pipeline/Rscripts/ibd.R -o "${OutputDir}"/plots_stats --genome 
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --het --out "${OutputDir}"/relatedness_steps/03het_unfiltered
 #5d LD prune snps from bfiles
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/relatedness_steps/01LD_prune_list.prune.in  --make-bed --out "${OutputDir}"/relatedness_steps/04LD_pruned
-Rscript ~/gwasqc_pipeline/Rscripts/heterozygosity.R -o "${OutputDir}"/plots_stats -r "${Relatedness:=$RelatednessDefault}" --het "${OutputDir}"/relatedness_steps/03het_unfiltered.het
+Rscript ~/gwasqc_pipeline/Rscripts/heterozygosity.R -o "${OutputDir}"/plots_stats --het "${OutputDir}"/relatedness_steps/03het_unfiltered.het
 
-if [ $(bc <<< "${Relatedness}<1") -eq 1 ]
+if [ $(bc <<< "${Relatedness:=$RelatednessDefault}<1") -eq 1 ]
 then
 	plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --rel-cutoff "${Relatedness:=$RelatednessDefault}" --make-bed --out "${OutputDir}"/relatedness_steps/05without_relateds
 	#5e regenerate heterozygosity estimates from filtered for validation
