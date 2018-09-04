@@ -59,7 +59,7 @@ fi
 #5a Creates a pruned list of SNP IDs for plotting on a principal components analysis
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --indep-pairwise 50 5 0.3 --out "${OutputDir}"/relatedness_steps/01LD_prune_list
 #5b Determine the relatednesss of samples
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/relatedness_steps/01LD_prune_list.prune.in --genome --max "${Relatedness:=$RelatednessDefault}" --out "${OutputDir}"/relatedness_steps/02relatedness
+plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/relatedness_steps/01LD_prune_list.prune.in --genome --out "${OutputDir}"/relatedness_steps/02relatedness
 #generate list of samples to remove based on relatedness
 Rscript ~/gwasqc_pipeline/Rscripts/ibd.R -o "${OutputDir}"/plots_stats --pihat "${Relatedness:=$RelatednessDefault}" --genome ${OutputDir}/relatedness_steps/02relatedness.genome #generate list of related samples and duplicates for removal
 
