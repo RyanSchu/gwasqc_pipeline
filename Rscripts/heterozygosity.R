@@ -4,9 +4,8 @@ library(ggplot2)
 library(argparse)
 
 parser <- ArgumentParser()
-parser$add_argument("--het", help="full path to the unfiltered het file")
-parser$add_argument("--tag", "-t", help="full path to the filtered het file")
-parser$add_argument("-r","--relatedness",help="Threshold of relatedness used for filtering")
+parser$add_argument("--het", help="full path to the het file")
+parser$add_argument("--tag", "-t", help="descriptive tag for file naming")
 parser$add_argument("-o", "--outputdir", help="directory where you would like to output your plots")
 args <- parser$parse_args()
 
@@ -16,13 +15,13 @@ hetoutfile<-paste(args$outputdir,"/Hetoutliers", args$tag, ".txt", sep="")
 hetpdf<-paste(args$outputdir,"/Heterozygosity", args$tag, ".pdf", sep="")
 hetstats<-paste(args$outputdir,"/Hetstats", args$tag, ".txt", sep="")
 
-HET <- read.table(args$unfilteredhet, header = T, as.is = T)
+HET <- read.table(args$het, header = T, as.is = T)
 H = (HET$N.NM.-HET$O.HOM.)/HET$N.NM.
 oldpar = par(mfrow=c(1,2))
 
 pdf(hetpdf)
-hist(H,50, main="H estimate before filtering")
-hist(HET$F,50, main="Heterozygosity estimates prior to filtering")
+hist(H,50, main="H estimate")
+hist(HET$F,50, main="Heterozygosity estimates")
 abline(v=mean(HET$F)+6*sd(HET$F),col="red")
 abline(v=mean(HET$F)-6*sd(HET$F),col="red")
 dev.off()
