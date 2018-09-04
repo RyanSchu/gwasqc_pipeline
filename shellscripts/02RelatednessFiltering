@@ -58,21 +58,21 @@ fi
 
 #5a Creates a pruned list of SNP IDs for plotting on a principal components analysis
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --indep-pairwise 50 5 0.3 --out "${OutputDir}"/relatedness_steps/01LD_prune_list
-#5b Determine the relatednesss of samples
+#5b create genome file for ibd chart
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/relatedness_steps/01LD_prune_list.prune.in --genome --out "${OutputDir}"/relatedness_steps/02relatedness
 #generate list of samples to remove based on relatedness
-Rscript ~/gwasqc_pipeline/Rscripts/ibd.R -o "${OutputDir}"/plots_stats --pihat "${Relatedness:=$RelatednessDefault}" --genome ${OutputDir}/relatedness_steps/02relatedness.genome #generate list of related samples and duplicates for removal
+Rscript ~/gwasqc_pipeline/Rscripts/ibd.R -o "${OutputDir}"/plots_stats --genome ${OutputDir}/relatedness_steps/02relatedness.genome 
 
 #5c heterozygosity check for unfiltered samples 
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --het --out "${OutputDir}"/relatedness_steps/03het_unfiltered
 #5d LD prune snps from bfiles
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/relatedness_steps/01LD_prune_list.prune.in  --make-bed --out "${OutputDir}"/relatedness_steps/04LD_pruned
+Rscript ~/gwasqc_pipeline/Rscripts/heterozygosity.R -o "${OutputDir}"/plots_stats -r "${Relatedness}" --het "${OutputDir}"/relatedness_steps/03het_unfiltered.het
 
-if [ -e "${OutputDir}"/plots_stats/related.to.remove.txt ] && [ "${Relatedness}" -ne 1 ]
+if [ $(bc <<< "${Relatedness}<1") -eq 1 ]
 then
-	plink --bfile "${OutputDir}"/relatedness_steps/04LD_pruned --remove "${OutputDir}"/plots_stats/related.to.remove.txt --make-bed --out "${OutputDir}"/relatedness_steps/05without_relateds
+	plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --rel-cutoff "${Relatedness:=$RelatednessDefault}" --make-bed --out "${OutputDir}"/relatedness_steps/05without_relateds
 	#5e regenerate heterozygosity estimates from filtered for validation
 	plink --bfile "${OutputDir}"/relatedness_steps/05without_relateds --het --out "${OutputDir}"/relatedness_steps/06het_without_relateds
+	Rscript ~/gwasqc_pipeline/Rscripts/heterozygosity.R -o "${OutputDir}"/plots_stats -r "${Relatedness}" --het "${OutputDir}"/relatedness_steps/05het_without_relateds.het ---tag no_relateds
 fi
-Rscript ~/gwasqc_pipeline/Rscripts/heterozygosity.R -o "${OutputDir}"/plots_stats -r "${Relatedness}" --filteredhet "${OutputDir}"/relatedness_steps/05het_without_relateds.het --unfilteredhet "${OutputDir}"/relatedness_steps/03het_unfiltered.het
-
