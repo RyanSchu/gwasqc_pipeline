@@ -11,7 +11,7 @@ AffyDict={}
 with open(args.csv, 'r') as affy:
   for line in affy:
     if ( line[0] != '#' ):
-     affy.next()
+     continue
     else:
       fields = line.split(',')
       if (fields[1] != '---'):
