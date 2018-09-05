@@ -74,5 +74,5 @@ then
 	plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --rel-cutoff "${Relatedness:=$RelatednessDefault}" --make-bed --out "${OutputDir}"/relatedness_steps/05without_relateds
 	#5e regenerate heterozygosity estimates from filtered for validation
 	plink --bfile "${OutputDir}"/relatedness_steps/05without_relateds --het --out "${OutputDir}"/relatedness_steps/06het_without_relateds
-	Rscript ~/gwasqc_pipeline/Rscripts/heterozygosity.R -o "${OutputDir}"/plots_stats -r "${Relatedness}" --het "${OutputDir}"/relatedness_steps/05het_without_relateds.het --tag no_relateds
+	Rscript ~/gwasqc_pipeline/Rscripts/heterozygosity.R -o "${OutputDir}"/plots_stats --het "${OutputDir}"/relatedness_steps/05het_without_relateds.het --tag no_relateds
 fi
