@@ -10,7 +10,7 @@ args = parser.parse_args()
 AffyDict={}
 with open(args.csv, 'r') as affy:
   for line in affy:
-    if ( line[0] != '#' ):
+    if ( line[0] == '#' ):
      continue
     else:
       fields = line.split(',')
