@@ -119,6 +119,9 @@ if [ "${RunAffy:=RunAffyDefault}" = T ] && [ -e "${AffymetrixAnnotations:?Affy a
 then
 	Rscript  ~/gwasqc_pipeline/Rscripts/AffyToRsid.R --bim "${BimFile}" --stats "${AffymetrixAnnotations}" -o "${OutputDir}"/hapmap/ 
 	plink --bed "${BedFile}" --bim "${OutputDir}"/hapmap/00rsID_format --fam "${FamFile}" --make-bed --out "${OutputDir}"/hapmap/00premerge
+	BedFile="${OutputDir}"/hapmap/00premerge.bed
+	BimFile="${OutputDir}"/hapmap/00premerge.bim
+	FamFile="${OutputDir}"/hapmap/00premerge.fam
 fi
 
 #6a Hapmap merge
