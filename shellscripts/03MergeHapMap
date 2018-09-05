@@ -117,7 +117,8 @@ fi
 #Translate SNP from Affy to rsid if necessary
 if [ "${RunAffy:=RunAffyDefault}" = T ] && [ -e "${AffymetrixAnnotations:?Affy annotation dne}" ]
 then
-	Rscript  ~/gwasqc_pipeline/Rscripts/AffyToRsid.R --bim "${BimFile}" --csv "${AffymetrixAnnotations:=$AffymetrixAnnotationsDefault}"
+	Rscript  ~/gwasqc_pipeline/Rscripts/AffyToRsid.R --bim "${BimFile}" --stats "${AffymetrixAnnotations}" -o "${OutputDir}"/hapmap/ 
+	plink --bed "${BedFile}" --bim "${OutputDir}"/hapmap/00rsID_format --fam "${FamFile}" --make-bed --out "${OutputDir}"/hapmap/00premerge
 fi
 
 #6a Hapmap merge
