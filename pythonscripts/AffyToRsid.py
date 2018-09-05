@@ -29,7 +29,7 @@ outbim = '/00AffyTranslated.bim'
 outbim = args.outputdir + outbim
 with open(outbim, 'wb') as out:
   for line in newbim:
-    out.write((line + '\n').encode('utf-8'))
+    out.write((line).encode('utf-8'))
       
       
 
