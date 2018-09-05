@@ -3,7 +3,7 @@ import argparse as ap
 
 parser = ap.ArgumentParser()
 parser.add_argument('--bim', help = 'file path of the target bim file to be translated')
-parser.add_argument('--csv', help = 'file path of the target affymetrix csv file containing the translations)
+parser.add_argument('--csv', help = 'file path of the target affymetrix csv file containing the translations')
 parser.add_argument('-o', '--outputdir', help = 'Output directory for the new bim file')
 args = parser.parse_args()
 
