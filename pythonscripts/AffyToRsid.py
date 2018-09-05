@@ -23,7 +23,7 @@ with open(args.bim, 'r') as bimfile:
     fields = line.split('\t')
     if ( fields[1] in AffyDict ):
       fields[1] = AffyDict[fields[1]]
-     newbim.append('\t'.join(fields))
+    newbim.append('\t'.join(fields))
      
 outbim = '/00AffyTranslated.bim'
 outbim = args.outputdir + outbim
