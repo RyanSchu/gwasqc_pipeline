@@ -49,7 +49,7 @@ uPC1 <- mean(yri$PC1) + 5*sd(yri$PC1)
 lPC1 <- mean(yri$PC1) - 5*sd(yri$PC1)
 uPC2 <- mean(yri$PC2) + 5*sd(yri$PC2)
 lPC2 <- mean(yri$PC2) - 5*sd(yri$PC2)
-ggplot() + geom_point(data=gwas,aes(x=PC1,y=PC2,col=pop,shape=pop))+geom_point(data=hm3,aes(x=PC1,y=PC2,col=pop,shape=pop))+ theme_bw() +geom_vline(xintercept=c(uPC1,lPC1)) +geom_hline(yintercept=c(uPC2,lPC2))
+ggplot() + geom_point(data=gwas,aes(x=PC1,y=PC2,col=pop,shape=pop))+geom_point(data=hm3,aes(x=PC1,y=PC2,col=pop,shape=pop))+ theme_bw() +geom_vline(xintercept=c(uPC1,lPC1)) +geom_hline(yintercept=c(uPC2,lPC2)) + ggtitle("Assuming homogeneous, non-admixed")
 
 
 
@@ -63,7 +63,7 @@ table(inclusion$pop)
 dim(samples)[1]
 dim(gwas)[1]-dim(samples)[1]
 
-ggplot() + geom_point(data=gwas,aes(x=PC1,y=PC2,col=gwas$IID %in% samples$IID,shape=gwas$IID %in% samples$IID))+geom_point(data=hm3,aes(x=PC1,y=PC2,col=pop,shape=pop))+ theme_bw()
+ggplot() + geom_point(data=gwas,aes(x=PC1,y=PC2,col=gwas$IID %in% samples$IID,shape=gwas$IID %in% samples$IID))+geom_point(data=hm3,aes(x=PC1,y=PC2,col=pop,shape=pop))+ theme_bw() + ggtitle("Assuming homogeneous, non-admixed")
 
 dev.off() 
 #write.table(samples, args$QCdir %&% "/PCA/GWAS_PCA.txt",quote=F,row.names=F,col.names=F)
