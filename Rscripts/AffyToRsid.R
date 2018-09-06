@@ -38,4 +38,4 @@ mergedbim2 <- mutate(mergedbim,snp=ifelse(is.na(MarkerAccession), as.character(V
 newbim <- dplyr::select(mergedbim2,V1,snp,V3,V4,V5,V6)
 filetest2<-newbim[!duplicated.data.frame(newbim),]
 
-write.table(filetest2,file = args$outputdir %&% "/00rsID_format",quote=F, sep="\t",row.names=F,col.names=F)
+write.table(filetest2,file = args$outputdir %&% "/00rsID_format.bim",quote=F, sep="\t",row.names=F,col.names=F)
