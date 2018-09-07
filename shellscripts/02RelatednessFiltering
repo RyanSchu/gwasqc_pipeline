@@ -51,6 +51,12 @@ then
   exit 1
 fi
 
+if [ ! -d "${OutputDir}" ]
+then
+  mkdir "${OutputDir}"
+  mkdir "${OutputDir}"/relatedness_steps
+  mkdir "${OutputDir}"/plots_stats
+fi
 if [ ! -d "${OutputDir}"/relatedness_steps ]
 then
   mkdir "${OutputDir}"/relatedness_steps
