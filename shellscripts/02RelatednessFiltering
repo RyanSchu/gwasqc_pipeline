@@ -55,6 +55,11 @@ if [ ! -d "${OutputDir}"/relatedness_steps ]
 then
   mkdir "${OutputDir}"/relatedness_steps
 fi
+if [ ! -d "${OutputDir}"/plots_stats ]
+then
+  mkdir "${OutputDir}"/plots_stats
+fi
+
 
 #5a Creates a pruned list of SNP IDs for plotting on a principal components analysis
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --indep-pairwise 50 5 0.3 --out "${OutputDir}"/relatedness_steps/01LD_prune_list
