@@ -1,7 +1,9 @@
 #!/bin/bash
 BfileDefault=~/QC/missingness_hwe_steps/05filtered_HWE
+PrefilterDefault=none
 OutputDirDefault=~/QC
 RelatednessDefault=1
+
 while :
 do
     case "$1" in
@@ -21,12 +23,22 @@ do
       		FamFile="$2"
 	        shift 2
 	        ;;
+      -k | --keep) #list of individuals you would like to keep. mutually exclusive with remove
+      	  	KeepList="$2"
+	        Prefilter=keep
+		shift 2
+	        ;;
       -o | --output) #directory where you'd like to send all your QC folders - will be folder hierarchy
          	OutputDir="$2"
 	        shift 2
 	        ;;
       -r | --relatedness) #Relatedness threshold you'd like to filter by
          	Relatedness="$2"
+	        shift 2
+	        ;;
+      --remove) #list of individuals you would like to remove
+      	  	RemoveList="$2"
+		Prefilter=remove
 	        shift 2
 	        ;;
       -*) #unknown 
@@ -66,6 +78,21 @@ then
   mkdir "${OutputDir}"/plots_stats
 fi
 
+#0 optional remove/keep samples - good for split populations
+case "${Prefilter:=$PrefilterDefault}" in
+	keep)
+		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/00filt_k
+		BedFile="${OutputDir}"/missingness_hwe_steps/00keep_samples.bed
+		BimFile="${OutputDir}"/missingness_hwe_steps/00keep_samples.bim
+		FamFile="${OutputDir}"/missingness_hwe_steps/00keep_samples.fam
+		;;
+	remove)
+		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/00filt_r
+		BedFile="${OutputDir}"/missingness_hwe_steps/00remove_samples.bed
+		BimFile="${OutputDir}"/missingness_hwe_steps/00remove_samples.bim
+		FamFile="${OutputDir}"/missingness_hwe_steps/00remove_samples.fam
+		;;
+esac
 
 #5a Creates a pruned list of SNP IDs for plotting on a principal components analysis
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --indep-pairwise 50 5 0.3 --out "${OutputDir}"/relatedness_steps/01LD_prune_list
