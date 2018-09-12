@@ -93,6 +93,11 @@ then
 	exit 1
 fi
 
+if [ ! -d "${OutputDir}" ]
+then
+	mkdir "${OutputDir}"
+fi
+
 if [ ! -d "${OutputDir}"/hapmap ]
 then
 	mkdir "${OutputDir}"/hapmap
