@@ -32,7 +32,7 @@ do
          	OutputDir="$2"
 	        shift 2
 	        ;;
-      --relatedness) #Relatedness threshold you'd like to filter by
+      --relatedness | --rel) #Relatedness threshold you'd like to filter by
          	Relatedness="$2"
 	        shift 2
 	        ;;
