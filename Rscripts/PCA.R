@@ -9,12 +9,19 @@ parser$add_argument("--val",help="full path to eigenvalue file")
 parser$add_argument("--vec",help="full path to eigenvector file")
 parser$add_argument("--fam", help="full path to the fam file youd like to use")
 parser$add_argument("-o", "--outputdir", help="directory where you would like to output your plots")
+parser$add_argument("--pop", help="full path to the ")
 args <- parser$parse_args()
 "%&%" = function(a,b) paste (a,b,sep="")
 
 pcaplots <- args$outputdir %&% "/pca_plots.pdf"
 
-hapmappopinfo <- read.table(args$hapmapdir %&% "/pop_HM3_hg18_forPCA.txt") %>% select (V1,V3)
+if (!is.null(args$pop)){
+  hapmappopinfo <- read.table(args$pop) %>% select (V1,V3)
+} else if (grepl("19",args$hapmapdir, fixed=TRUE)) {
+  hapmappopinfo <- read.table(args$hapmapdir %&% "/pop_HM3_hg19_forPCA.txt") %>% select (V1,V3)
+} else if (grepl( "18",args$hapmapdir, fixed=TRUE)) {
+  hapmappopinfo <- read.table(args$hapmapdir %&% "/pop_HM3_hg18_forPCA.txt") %>% select (V1,V3)
+}
 colnames(hapmappopinfo) <- c("pop","IID")
 fam <- read.table(args$fam) %>% select (V1,V2)
 colnames(fam) <- c("FID","IID")
