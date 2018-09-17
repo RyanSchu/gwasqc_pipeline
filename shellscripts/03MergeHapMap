@@ -132,18 +132,25 @@ fi
 #6a Hapmap merge
 plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --bmerge "${HapMapDir}"/*.bed "${HapMapDir}"/*.bim "${HapMapDir}"/*.fam --make-bed --out "${OutputDir}"/hapmap/01primarymerge
 
-#6b create new hapmap files without the missing snps
-plink --bed "${HapMapDir}"/*.bed  --bim "${HapMapDir}"/*.bim --fam "${HapMapDir}"/*.fam --exclude "${OutputDir}"/hapmap/01primarymerge-merge.missnp --make-bed --out "${OutputDir}"/hapmap/02hapmap_withoutmissing
- 
-#6c Hapmap merge again without missing snps
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --bmerge "${OutputDir}"/hapmap/02hapmap_withoutmissing.bed "${OutputDir}"/hapmap/02hapmap_withoutmissing.bim "${OutputDir}"/hapmap/02hapmap_withoutmissing.fam --make-bed --out "${OutputDir}"/hapmap/03Withoutmissing
- 
-#6d Filter merged file to SNPs with >90% genotypes
-plink --bfile "${OutputDir}"/hapmap/03Withoutmissing --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/"04Without_missing_geno${GenotypingThreshold}_noX"
+if [ -e "${OutputDir}"/hapmap/01primarymerge-merge.missnp ] #Some gwas don't produce missnp files and these commands only apply to those
+then
+	#6b create new hapmap files without the missing snps
+	plink --bed "${HapMapDir}"/*.bed  --bim "${HapMapDir}"/*.bim --fam "${HapMapDir}"/*.fam --exclude "${OutputDir}"/hapmap/01primarymerge-merge.missnp --make-bed --out "${OutputDir}"/hapmap/02hapmap_withoutmissing
+	#6c Hapmap merge again without missing snps
+	plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --bmerge "${OutputDir}"/hapmap/02hapmap_withoutmissing.bed "${OutputDir}"/hapmap/02hapmap_withoutmissing.bim "${OutputDir}"/hapmap/02hapmap_withoutmissing.fam --make-bed --out "${OutputDir}"/hapmap/03Withoutmissing
+	#6d Filter merged file to SNPs with >90% genotypes
+	plink --bfile "${OutputDir}"/hapmap/03Withoutmissing --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/"04Without_missing_geno${GenotypingThreshold}_noX"
+	Bfile="${OutputDir}"/hapmap/"04Without_missing_geno${GenotypingThreshold}_noX"
+else
+	#6d Filter merged file to SNPs with >90% genotypes
+	plink --bfile "${OutputDir}"/hapmap/01primarymerge --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/"02-04geno${GenotypingThreshold}_noX"
+	Bfile="${OutputDir}"/hapmap/"02-04geno${GenotypingThreshold}_noX"
+fi
+
 #6e Creat list of LD pruned snps
-plink --bfile "${OutputDir}"/hapmap/"04Without_missing_geno${GenotypingThreshold}_noX" --indep-pairwise 50 5 0.3 --chr 1-22 --out "${OutputDir}"/hapmap/05LD_prune_list
+plink --bfile "${Bfile}" --indep-pairwise 50 5 0.3 --chr 1-22 --out "${OutputDir}"/hapmap/05LD_prune_list
 #6g extract LD pruned snps
-plink --bfile "${OutputDir}"/hapmap/"04Without_missing_geno${GenotypingThreshold}_noX" --extract "${OutputDir}"/hapmap/05LD_prune_list.prune.in --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/07final_LDpruned
+plink --bfile "${Bfile}" --extract "${OutputDir}"/hapmap/05LD_prune_list.prune.in --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/07final_LDpruned
 #6h Run PCA
 plink --bfile "${OutputDir}"/hapmap/07final_LDpruned --pca "${PCA:=$PCADefault}"  header --out "${OutputDir}"/PCA/pca
 
