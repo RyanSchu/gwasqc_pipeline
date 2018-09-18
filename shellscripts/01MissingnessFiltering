@@ -77,9 +77,7 @@ if [ ! -d "${OutputDir:=$OutputDirDefault}" ]
 then
   mkdir "${OutputDir}"
   mkdir "${OutputDir}"/plots_stats
-  mkdir "${OutputDir}"/hapmap
   mkdir "${OutputDir}"/missingness_hwe_steps
-  mkdir "${OutputDir}"/relatedness_steps
 fi
 
 #0 Optional prefiltering step for sample selection and for autosomal filtering
