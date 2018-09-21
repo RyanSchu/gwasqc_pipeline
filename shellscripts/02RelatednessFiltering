@@ -6,7 +6,7 @@ BfileDefault=~/QC/missingness_hwe_steps/05filtered_HWE
 PrefilterDefault=none
 OutputDirDefault=~/QC
 RelatednessDefault=1
-
+RunIBD=true
 while :
 do
     case "$1" in
@@ -34,6 +34,10 @@ do
       -o | --output) #directory where you'd like to send all your QC folders - will be folder hierarchy
          	OutputDir="$2"
 	        shift 2
+	        ;;
+      --offplotibd) #/path/to/file.fam
+      		RunIBD=False
+	        shift 1
 	        ;;
       --relatedness | --rel) #Relatedness threshold you'd like to filter by
          	Relatedness="$2"
@@ -102,8 +106,11 @@ esac
 #5b create genome file for ibd chart
 "${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/relatedness_steps/01LD_prune_list.prune.in --genome --out "${OutputDir}"/relatedness_steps/02relatedness
 #generate list of samples to remove based on relatedness
-Rscript ~/gwasqc_pipeline/Rscripts/ibd.R -o "${OutputDir}"/plots_stats --genome ${OutputDir}/relatedness_steps/02relatedness.genome 
 
+if [ "${RunIBD}" == "true" ] 
+then
+	Rscript ~/gwasqc_pipeline/Rscripts/ibd.R -o "${OutputDir}"/plots_stats --genome ${OutputDir}/relatedness_steps/02relatedness.genome 
+fi
 #5c heterozygosity check for unfiltered samples 
 "${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --het --out "${OutputDir}"/relatedness_steps/03het_unfiltered
 #5d LD prune snps from bfiles
