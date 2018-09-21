@@ -124,7 +124,7 @@ then
 	then
 		mkdir "${OutputDir}"/liftover
 	fi
-	/usr/local/bin/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --recode --out "${OutputDir}"/liftover/lift_input
+	"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --recode --out "${OutputDir}"/liftover/lift_input
 	python ~/gwasqc_pipeline/LiftMap.py -m "${OutputDir}"/liftover/lift_input.map -p "${OutputDir}"/liftover/lift_input.ped -o "${OutputDir}"/liftover/post_lift
 	"${PlinkPath}"/plink --file "${OutputDir}"/liftover/post_lift --make-bed --out "${OutputDir}"/liftover/hg19
 	BedFile="${OutputDir}"/liftover/hg19.bed
