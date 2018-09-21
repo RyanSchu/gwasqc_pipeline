@@ -1,5 +1,7 @@
 #!/bin/bash
 
+PlinkPath=/usr/local/bin
+
 #AffymetrixAnnotationsDefault=~/GenomeWideSNP_6.na35.annot.csv
 AutosomeDefault=False
 BfileDefault=~/QC/relatedness_steps/04without_relateds
@@ -11,6 +13,7 @@ OutputDirDefault=~/QC
 PCADefault=10
 PrefilterDefault=none
 RunAffyDefault=F
+
 
 while :
 do
@@ -121,9 +124,9 @@ then
 	then
 		mkdir "${OutputDir}"/liftover
 	fi
-	plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --recode --out "${OutputDir}"/liftover/lift_input
+	/usr/local/bin/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --recode --out "${OutputDir}"/liftover/lift_input
 	python ~/gwasqc_pipeline/LiftMap.py -m "${OutputDir}"/liftover/lift_input.map -p "${OutputDir}"/liftover/lift_input.ped -o "${OutputDir}"/liftover/post_lift
-	plink --file "${OutputDir}"/liftover/post_lift --make-bed --out "${OutputDir}"/liftover/hg19
+	"${PlinkPath}"/plink --file "${OutputDir}"/liftover/post_lift --make-bed --out "${OutputDir}"/liftover/hg19
 	BedFile="${OutputDir}"/liftover/hg19.bed
 	BimFile="${OutputDir}"/liftover/hg19.bim
 	FamFile="${OutputDir}"/liftover/hg19.fam
@@ -132,7 +135,7 @@ then
 #If you would like to remove outliers from relatedness do so here
 if [ "${Prefilter}" = "remove" ] 
 then
-	plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --make-bed --out "${OutputDir}"/hapmap/00remove_outliers
+	"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --make-bed --out "${OutputDir}"/hapmap/00remove_outliers
 	BedFile="${OutputDir}"/hapmap/00remove_outliers.bed
 	BimFile="${OutputDir}"/hapmap/00remove_outliers.bim
 	FamFile="${OutputDir}"/hapmap/00remove_outliers.fam
@@ -143,36 +146,36 @@ fi
 if [ "${RunAffy:=RunAffyDefault}" = T ] && [ -e "${AffymetrixAnnotations:?Affy annotation dne}" ]
 then
 	Rscript  ~/gwasqc_pipeline/Rscripts/AffyToRsid.R --bim "${BimFile}" --stats "${AffymetrixAnnotations}" -o "${OutputDir}"/hapmap/ 
-	plink --bed "${BedFile}" --bim "${OutputDir}"/hapmap/00rsID_format.bim --fam "${FamFile}" --make-bed --out "${OutputDir}"/hapmap/00premerge
+	"${PlinkPath}"/plink --bed "${BedFile}" --bim "${OutputDir}"/hapmap/00rsID_format.bim --fam "${FamFile}" --make-bed --out "${OutputDir}"/hapmap/00premerge
 	BedFile="${OutputDir}"/hapmap/00premerge.bed
 	BimFile="${OutputDir}"/hapmap/00premerge.bim
 	FamFile="${OutputDir}"/hapmap/00premerge.fam
 fi
 
 #6a Hapmap merge
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --bmerge "${HapMapDir}"/*.bed "${HapMapDir}"/*.bim "${HapMapDir}"/*.fam --make-bed --out "${OutputDir}"/hapmap/01primarymerge
+"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --bmerge "${HapMapDir}"/*.bed "${HapMapDir}"/*.bim "${HapMapDir}"/*.fam --make-bed --out "${OutputDir}"/hapmap/01primarymerge
 
 if [ -e "${OutputDir}"/hapmap/01primarymerge-merge.missnp ] #Some gwas don't produce missnp files and these commands only apply to those
 then
 	#6b create new hapmap files without the missing snps
-	plink --bed "${HapMapDir}"/*.bed  --bim "${HapMapDir}"/*.bim --fam "${HapMapDir}"/*.fam --exclude "${OutputDir}"/hapmap/01primarymerge-merge.missnp --make-bed --out "${OutputDir}"/hapmap/02hapmap_withoutmissing
+	"${PlinkPath}"/plink --bed "${HapMapDir}"/*.bed  --bim "${HapMapDir}"/*.bim --fam "${HapMapDir}"/*.fam --exclude "${OutputDir}"/hapmap/01primarymerge-merge.missnp --make-bed --out "${OutputDir}"/hapmap/02hapmap_withoutmissing
 	#6c Hapmap merge again without missing snps
-	plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --bmerge "${OutputDir}"/hapmap/02hapmap_withoutmissing.bed "${OutputDir}"/hapmap/02hapmap_withoutmissing.bim "${OutputDir}"/hapmap/02hapmap_withoutmissing.fam --make-bed --out "${OutputDir}"/hapmap/03Withoutmissing
+	"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --bmerge "${OutputDir}"/hapmap/02hapmap_withoutmissing.bed "${OutputDir}"/hapmap/02hapmap_withoutmissing.bim "${OutputDir}"/hapmap/02hapmap_withoutmissing.fam --make-bed --out "${OutputDir}"/hapmap/03Withoutmissing
 	#6d Filter merged file to SNPs with >90% genotypes
-	plink --bfile "${OutputDir}"/hapmap/03Withoutmissing --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/"04Without_missing_geno${GenotypingThreshold}_noX"
+	"${PlinkPath}"/plink --bfile "${OutputDir}"/hapmap/03Withoutmissing --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/"04Without_missing_geno${GenotypingThreshold}_noX"
 	Bfile="${OutputDir}"/hapmap/"04Without_missing_geno${GenotypingThreshold}_noX"
 else
 	#6d Filter merged file to SNPs with >90% genotypes
-	plink --bfile "${OutputDir}"/hapmap/01primarymerge --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/"02-04geno${GenotypingThreshold}_noX"
+	"${PlinkPath}"/plink --bfile "${OutputDir}"/hapmap/01primarymerge --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/"02-04geno${GenotypingThreshold}_noX"
 	Bfile="${OutputDir}"/hapmap/"02-04geno${GenotypingThreshold}_noX"
 fi
 
 #6e Creat list of LD pruned snps
-plink --bfile "${Bfile}" --indep-pairwise 50 5 0.3 --chr 1-22 --out "${OutputDir}"/hapmap/05LD_prune_list
+"${PlinkPath}"/plink --bfile "${Bfile}" --indep-pairwise 50 5 0.3 --chr 1-22 --out "${OutputDir}"/hapmap/05LD_prune_list
 #6g extract LD pruned snps
-plink --bfile "${Bfile}" --extract "${OutputDir}"/hapmap/05LD_prune_list.prune.in --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/07final_LDpruned
+"${PlinkPath}"/plink --bfile "${Bfile}" --extract "${OutputDir}"/hapmap/05LD_prune_list.prune.in --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/07final_LDpruned
 #6h Run PCA
-plink --bfile "${OutputDir}"/hapmap/07final_LDpruned --pca "${PCA:=$PCADefault}"  header --out "${OutputDir}"/PCA/pca
+"${PlinkPath}"/plink --bfile "${OutputDir}"/hapmap/07final_LDpruned --pca "${PCA:=$PCADefault}"  header --out "${OutputDir}"/PCA/pca
 
 Rscript ~/gwasqc_pipeline/Rscripts/PCA.R --hapmapdir "${HapMapDir}" --val "${OutputDir}"/PCA/pca.eigenval --vec "${OutputDir}"/PCA/pca.eigenvec --fam "${OutputDir}"/hapmap/07final_LDpruned.fam --outputdir "${OutputDir}"/PCA/
 
