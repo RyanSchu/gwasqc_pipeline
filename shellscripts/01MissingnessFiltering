@@ -1,5 +1,7 @@
 #!/bin/bash
 
+PlinkPath=/usr/local/bin
+
 AutosomeDefault=False
 BfileDefault=/home/wheelerlab2/Data/MESA_dbGaP_55081/phg000071.v2.NHLBI_SHARE_MESA.genotype-calls-matrixfmt.c1/SHARE_MESA_c1
 GenotypingThresholdDefault=0.01
@@ -83,31 +85,31 @@ fi
 #0 Optional prefiltering step for sample selection and for autosomal filtering
 case "${Autosome:=$AutosomeDefault}:${Prefilter:=$PrefilterDefault}" in
 	True:keep)
-		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --autosome --make-bed --out "${OutputDir}"/missingness_hwe_steps/00autosome_k
+		"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --autosome --make-bed --out "${OutputDir}"/missingness_hwe_steps/00autosome_k
 		BedFile="${OutputDir}"/missingness_hwe_steps/00autosome_k.bed
 		BimFile="${OutputDir}"/missingness_hwe_steps/00autosome_k.bim
 		FamFile="${OutputDir}"/missingness_hwe_steps/00autosome_k.fam
 		;;
 	True:remove)
-		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --autosome --make-bed --out "${OutputDir}"/missingness_hwe_steps/00autosome_r
+		"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --autosome --make-bed --out "${OutputDir}"/missingness_hwe_steps/00autosome_r
 		BedFile="${OutputDir}"/missingness_hwe_steps/00autosome_r.bed
 		BimFile="${OutputDir}"/missingness_hwe_steps/00autosome_r.bim
 		FamFile="${OutputDir}"/missingness_hwe_steps/00autosome_r.fam
 		;;
 	True:none)
-		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --autosome --make-bed --out "${OutputDir}"/missingness_hwe_steps/00autosome
+		"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --autosome --make-bed --out "${OutputDir}"/missingness_hwe_steps/00autosome
 		BedFile="${OutputDir}"/missingness_hwe_steps/00autosome.bed
 		BimFile="${OutputDir}"/missingness_hwe_steps/00autosome.bim
 		FamFile="${OutputDir}"/missingness_hwe_steps/00autosome.fam
 		;;
 	False:keep)
-		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/00filt_k
+		"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/00filt_k
 		BedFile="${OutputDir}"/missingness_hwe_steps/00filt_k.bed
 		BimFile="${OutputDir}"/missingness_hwe_steps/00filt_k.bim
 		FamFile="${OutputDir}"/missingness_hwe_steps/00filt_k.fam
 		;;
 	False:remove)
-		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/00filt_r
+		"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/00filt_r
 		BedFile="${OutputDir}"/missingness_hwe_steps/00filt_r.bed
 		BimFile="${OutputDir}"/missingness_hwe_steps/00filt_r.bim
 		FamFile="${OutputDir}"/missingness_hwe_steps/00filt_r.fam
@@ -115,24 +117,24 @@ case "${Autosome:=$AutosomeDefault}:${Prefilter:=$PrefilterDefault}" in
 esac
 
 #1 for determining genotyping threshold
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --missing --out "${OutputDir}"/missingness_hwe_steps/01initial_missingness
+"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --missing --out "${OutputDir}"/missingness_hwe_steps/01initial_missingness
 #call rate distribution check
 #2 fitlers out based on genotyping threshold
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_filtered"
+"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_filtered"
 #3 For validation of missingness threshold and call rate distribution check
-plink --bfile "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_filtered" --missing --out "${OutputDir}"/missingness_hwe_steps/03missingness_validation
+"${PlinkPath}"/plink --bfile "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_filtered" --missing --out "${OutputDir}"/missingness_hwe_steps/03missingness_validation
 #call rate distribution validation
 
 Rscript ~/gwasqc_pipeline/Rscripts/CallRateDistribution.R -t "${GenotypingThreshold}" --QCdir "${OutputDir}"
 
 #4 for later calculating HWE statistics
-plink --bfile "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_filtered" --hardy --out "${OutputDir}"/missingness_hwe_steps/04initial_HWE_stats
+"${PlinkPath}"/plink --bfile "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_filtered" --hardy --out "${OutputDir}"/missingness_hwe_steps/04initial_HWE_stats
 #calculate HWE statistics prefiltering
 Rscript ~/gwasqc_pipeline/Rscripts/hwe.R --hwe "${OutputDir}"/missingness_hwe_steps/04initial_HWE_stats.hwe -o "${OutputDir}"/plots_stats/ -t initial
 
 #5 Filter by HWE threshold and recalculate staistics
-plink --bfile "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_filtered"  --hwe "${HWEpval:=$HWEpvalDefault}" midp --make-bed --out "${OutputDir}"/missingness_hwe_steps/05filtered_HWE
-plink --bfile "${OutputDir}"/missingness_hwe_steps/05filtered_HWE --hardy --out "${OutputDir}"/missingness_hwe_steps/05filtered_HWE
+"${PlinkPath}"/plink --bfile "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_filtered"  --hwe "${HWEpval:=$HWEpvalDefault}" midp --make-bed --out "${OutputDir}"/missingness_hwe_steps/05filtered_HWE
+"${PlinkPath}"/plink --bfile "${OutputDir}"/missingness_hwe_steps/05filtered_HWE --hardy --out "${OutputDir}"/missingness_hwe_steps/05filtered_HWE
 
 Rscript ~/gwasqc_pipeline/Rscripts/hwe.R --hwe "${OutputDir}"/missingness_hwe_steps/05filtered_HWE.hwe -o "${OutputDir}"/plots_stats/ -t filtered
 

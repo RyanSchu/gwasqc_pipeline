@@ -1,4 +1,7 @@
 #!/bin/bash
+
+PlinkPath=/usr/local/bin
+
 BfileDefault=~/QC/missingness_hwe_steps/05filtered_HWE
 PrefilterDefault=none
 OutputDirDefault=~/QC
@@ -81,13 +84,13 @@ fi
 #0 optional remove/keep samples - good for split populations
 case "${Prefilter:=$PrefilterDefault}" in
 	keep)
-		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/00filt_k
+		"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --keep "${KeepList}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/00filt_k
 		BedFile="${OutputDir}"/missingness_hwe_steps/00keep_samples.bed
 		BimFile="${OutputDir}"/missingness_hwe_steps/00keep_samples.bim
 		FamFile="${OutputDir}"/missingness_hwe_steps/00keep_samples.fam
 		;;
 	remove)
-		plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/00filt_r
+		"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --remove "${RemoveList}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/00filt_r
 		BedFile="${OutputDir}"/missingness_hwe_steps/00remove_samples.bed
 		BimFile="${OutputDir}"/missingness_hwe_steps/00remove_samples.bim
 		FamFile="${OutputDir}"/missingness_hwe_steps/00remove_samples.fam
@@ -95,22 +98,22 @@ case "${Prefilter:=$PrefilterDefault}" in
 esac
 
 #5a Creates a pruned list of SNP IDs for plotting on a principal components analysis
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --indep-pairwise 50 5 0.3 --out "${OutputDir}"/relatedness_steps/01LD_prune_list
+"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --indep-pairwise 50 5 0.3 --out "${OutputDir}"/relatedness_steps/01LD_prune_list
 #5b create genome file for ibd chart
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/relatedness_steps/01LD_prune_list.prune.in --genome --out "${OutputDir}"/relatedness_steps/02relatedness
+"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/relatedness_steps/01LD_prune_list.prune.in --genome --out "${OutputDir}"/relatedness_steps/02relatedness
 #generate list of samples to remove based on relatedness
 Rscript ~/gwasqc_pipeline/Rscripts/ibd.R -o "${OutputDir}"/plots_stats --genome ${OutputDir}/relatedness_steps/02relatedness.genome 
 
 #5c heterozygosity check for unfiltered samples 
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --het --out "${OutputDir}"/relatedness_steps/03het_unfiltered
+"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --het --out "${OutputDir}"/relatedness_steps/03het_unfiltered
 #5d LD prune snps from bfiles
-plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/relatedness_steps/01LD_prune_list.prune.in  --make-bed --out "${OutputDir}"/relatedness_steps/04LD_pruned
+"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/relatedness_steps/01LD_prune_list.prune.in  --make-bed --out "${OutputDir}"/relatedness_steps/04LD_pruned
 Rscript ~/gwasqc_pipeline/Rscripts/heterozygosity.R -o "${OutputDir}"/plots_stats --het "${OutputDir}"/relatedness_steps/03het_unfiltered.het --tag with_relateds
 
 if [ $(bc <<< "${Relatedness:=$RelatednessDefault}<1") -eq 1 ]
 then
-	plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --rel-cutoff "${Relatedness:=$RelatednessDefault}" --make-bed --out "${OutputDir}"/relatedness_steps/05without_relateds
+	"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --rel-cutoff "${Relatedness:=$RelatednessDefault}" --make-bed --out "${OutputDir}"/relatedness_steps/05without_relateds
 	#5e regenerate heterozygosity estimates from filtered for validation
-	plink --bfile "${OutputDir}"/relatedness_steps/05without_relateds --het --out "${OutputDir}"/relatedness_steps/06het_without_relateds
+	"${PlinkPath}"/plink --bfile "${OutputDir}"/relatedness_steps/05without_relateds --het --out "${OutputDir}"/relatedness_steps/06het_without_relateds
 	Rscript ~/gwasqc_pipeline/Rscripts/heterozygosity.R -o "${OutputDir}"/plots_stats --het "${OutputDir}"/relatedness_steps/06het_without_relateds.het --tag no_relateds
 fi
