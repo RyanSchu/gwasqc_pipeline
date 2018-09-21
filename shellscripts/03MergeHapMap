@@ -88,7 +88,7 @@ echo "Using bed file ${BedFile:=${BFile:=$BfileDefault}.bed}"
 echo "Using fam file ${FamFile:=${BFile:=$BfileDefault}.fam}"
 echo "Using Output Directory ${OutputDir:=$OutputDirDefault}"
 echo "Using hapmap files located in ${HapMapDir:=$HapMapDirDefault}"
-echo "Performing Liftover: ${LiftOver:=LiftOverDefault}"
+echo "Performing Liftover: ${LiftOver:=$LiftOverDefault}"
 
 if [ ! -e "${BimFile}" ] || [ ! -e "${FamFile}" ] || [ ! -e "${BedFile}" ]
 then
@@ -130,7 +130,7 @@ then
 	BedFile="${OutputDir}"/liftover/hg19.bed
 	BimFile="${OutputDir}"/liftover/hg19.bim
 	FamFile="${OutputDir}"/liftover/hg19.fam
-then
+fi
 
 #If you would like to remove outliers from relatedness do so here
 if [ "${Prefilter}" = "remove" ] 
