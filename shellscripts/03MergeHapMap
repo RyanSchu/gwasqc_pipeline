@@ -23,10 +23,10 @@ do
 	        RunAffy=T
 	        shift 2
 	        ;;
-     # -a | --autosome) #flag for filtering by autosome
-	#        Autosome=True
-	 #       shift 1
-	  #      ;;
+      -a | --autosome) #flag for filtering by autosome
+	        Autosome=True
+	        shift 1
+	        ;;
       -b | --bfile) #same as normal plink - Path to all files and the shared prefix
 	        BFile="$2"  
 	        shift 2
@@ -87,6 +87,7 @@ echo "Using bim file ${BimFile:=${BFile:=$BfileDefault}.bim}"
 echo "Using bed file ${BedFile:=${BFile:=$BfileDefault}.bed}"
 echo "Using fam file ${FamFile:=${BFile:=$BfileDefault}.fam}"
 echo "Using Output Directory ${OutputDir:=$OutputDirDefault}"
+echo "Performing Autosome Filtering is: ${Autosome:=AutosomeDefault}"
 echo "Using hapmap files located in ${HapMapDir:=$HapMapDirDefault}"
 echo "Performing Liftover: ${LiftOver:=$LiftOverDefault}"
 
@@ -163,18 +164,40 @@ then
 	#6c Hapmap merge again without missing snps
 	"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --bmerge "${OutputDir}"/hapmap/02hapmap_withoutmissing.bed "${OutputDir}"/hapmap/02hapmap_withoutmissing.bim "${OutputDir}"/hapmap/02hapmap_withoutmissing.fam --make-bed --out "${OutputDir}"/hapmap/03Withoutmissing
 	#6d Filter merged file to SNPs with >90% genotypes
-	"${PlinkPath}"/plink --bfile "${OutputDir}"/hapmap/03Withoutmissing --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/"04Without_missing_geno${GenotypingThreshold}_noX"
-	Bfile="${OutputDir}"/hapmap/"04Without_missing_geno${GenotypingThreshold}_noX"
+	if [ "${Autosome}" = "True" ]
+	then
+		"${PlinkPath}"/plink --bfile "${OutputDir}"/hapmap/03Withoutmissing --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/"04Without_missing_geno${GenotypingThreshold}_noX"
+		Bfile="${OutputDir}"/hapmap/"04Without_missing_geno${GenotypingThreshold}_noX"
+	else
+		"${PlinkPath}"/plink --bfile "${OutputDir}"/hapmap/03Withoutmissing --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --make-bed --out "${OutputDir}"/hapmap/"04Without_missing_geno${GenotypingThreshold}_noX"
+		Bfile="${OutputDir}"/hapmap/"04Without_missing_geno${GenotypingThreshold}_noX"
+	fi
 else
-	#6d Filter merged file to SNPs with >90% genotypes
-	"${PlinkPath}"/plink --bfile "${OutputDir}"/hapmap/01primarymerge --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/"02-04geno${GenotypingThreshold}_noX"
-	Bfile="${OutputDir}"/hapmap/"02-04geno${GenotypingThreshold}_noX"
+	if [ "${Autosome}" = "True" ]
+	then
+		#6d Filter merged file to SNPs with >90% genotypes
+		"${PlinkPath}"/plink --bfile "${OutputDir}"/hapmap/01primarymerge --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/"02-04geno${GenotypingThreshold}_noX"
+		Bfile="${OutputDir}"/hapmap/"02-04geno${GenotypingThreshold}_noX"
+	else
+		#6d Filter merged file to SNPs with >90% genotypes
+		"${PlinkPath}"/plink --bfile "${OutputDir}"/hapmap/01primarymerge --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/"02-04geno${GenotypingThreshold}_noX"
+		Bfile="${OutputDir}"/hapmap/"02-04geno${GenotypingThreshold}_noX"
+	fi
 fi
 
 #6e Creat list of LD pruned snps
-"${PlinkPath}"/plink --bfile "${Bfile}" --indep-pairwise 50 5 0.3 --chr 1-22 --out "${OutputDir}"/hapmap/05LD_prune_list
-#6g extract LD pruned snps
-"${PlinkPath}"/plink --bfile "${Bfile}" --extract "${OutputDir}"/hapmap/05LD_prune_list.prune.in --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/07final_LDpruned
+if [ "${Autosome}" = "True" ]
+then
+	"${PlinkPath}"/plink --bfile "${Bfile}" --indep-pairwise 50 5 0.3 --chr 1-22 --out "${OutputDir}"/hapmap/05LD_prune_list
+	#6g extract LD pruned snps
+	"${PlinkPath}"/plink --bfile "${Bfile}" --extract "${OutputDir}"/hapmap/05LD_prune_list.prune.in --chr 1-22 --make-bed --out "${OutputDir}"/hapmap/07final_LDpruned
+else
+	"${PlinkPath}"/plink --bfile "${Bfile}" --indep-pairwise 50 5 0.3 --out "${OutputDir}"/hapmap/05LD_prune_list
+	#6g extract LD pruned snps
+	"${PlinkPath}"/plink --bfile "${Bfile}" --extract "${OutputDir}"/hapmap/05LD_prune_list.prune.in --make-bed --out "${OutputDir}"/hapmap/07final_LDpruned
+
+fi
+
 #6h Run PCA
 "${PlinkPath}"/plink --bfile "${OutputDir}"/hapmap/07final_LDpruned --pca "${PCA:=$PCADefault}"  header --out "${OutputDir}"/PCA/pca
 
