@@ -78,7 +78,13 @@ fi
 if [ ! -d "${OutputDir:=$OutputDirDefault}" ]
 then
   mkdir "${OutputDir}"
+fi
+if [ ! -d "${OutputDir}"/plots_stats ]
+then
   mkdir "${OutputDir}"/plots_stats
+fi
+if [ ! -d "${OutputDir}"/missingness_hwe_steps ]
+then
   mkdir "${OutputDir}"/missingness_hwe_steps
 fi
 
