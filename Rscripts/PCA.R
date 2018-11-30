@@ -13,7 +13,7 @@ parser$add_argument("--pop", help="full path to the ")
 args <- parser$parse_args()
 "%&%" = function(a,b) paste (a,b,sep="")
 
-pcaplots <- args$outputdir %&% "/pca_plots.pdf"
+pcaplots <- args$outputdir %&% "/merged_pca_plots.pdf"
 
 if (!is.null(args$pop)){
   hapmappopinfo <- read.table(args$pop) %>% select (V1,V3)
