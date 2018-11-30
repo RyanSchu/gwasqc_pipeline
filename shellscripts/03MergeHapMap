@@ -129,6 +129,10 @@ then
 	FamFile="${OutputDir}"/hapmap/00remove_outliers.fam
 fi
 
+#Create PCA for unmerged population
+"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --pca "${PCA:=$PCADefault}"  header --out "${OutputDir}"/PCA/unmerged_pca
+Rscript ~/gwasqc_pipeline/Rscripts/eigenplot.R --val "${OutputDir}"/PCA/unmerged_pca.eigenval --vec "${OutputDir}"/PCA/unmerged_pca.eigenvec --outputdir "${OutputDir}"/PCA/
+
 #Liftover if necessary
 #Translate SNP from Affy to rsid if necessary
 if [ "${RunAffy:=RunAffyDefault}" = T ] && [ -e "${AffymetrixAnnotations:?Affy annotation dne}" ]
@@ -199,7 +203,7 @@ else
 fi
 
 #6h Run PCA
-"${PlinkPath}"/plink --bfile "${OutputDir}"/hapmap/07final_LDpruned --pca "${PCA:=$PCADefault}"  header --out "${OutputDir}"/PCA/pca
+"${PlinkPath}"/plink --bfile "${OutputDir}"/hapmap/07final_LDpruned --pca "${PCA:=$PCADefault}"  header --out "${OutputDir}"/PCA/merged_pca
 
-Rscript ~/gwasqc_pipeline/Rscripts/PCA.R --hapmapdir "${HapMapDir}" --val "${OutputDir}"/PCA/pca.eigenval --vec "${OutputDir}"/PCA/pca.eigenvec --fam "${OutputDir}"/hapmap/07final_LDpruned.fam --outputdir "${OutputDir}"/PCA/
+Rscript ~/gwasqc_pipeline/Rscripts/PCA.R --hapmapdir "${HapMapDir}" --val "${OutputDir}"/PCA/merged_pca.eigenval --vec "${OutputDir}"/PCA/merged_pca.eigenvec --fam "${OutputDir}"/hapmap/07final_LDpruned.fam --outputdir "${OutputDir}"/PCA/
 
