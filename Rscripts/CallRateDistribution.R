@@ -14,14 +14,16 @@ percentage<-100*(1-args$threshold)
 
 #read in files
 lmiss <- read.table(args$QCdir %&% "/missingness_hwe_steps/01initial_missingness.lmiss", header=T)
-imiss <- read.table(args$QCdir %&% "/missingness_hwe_steps/03missingness_validation.imiss", header = T)
+imiss <- read.table(args$QCdir %&% "/missingness_hwe_steps/01initial_missingness.imiss", header=T)
+newimiss <- read.table(args$QCdir %&% "/missingness_hwe_steps/03missingness_validation.imiss", header = T)
 newlmiss <- read.table(args$QCdir %&% "/missingness_hwe_steps/03missingness_validation.lmiss", header = T)
 
 #create histogram's of missingness before and after filtering
 pdf(args$QCdir %&% "/plots_stats/callRateDistributions.pdf")
 hist(lmiss$F_MISS, main="Call rate distribution for SNPs before filtering")
-hist(newlmiss$F_MISS, main="distributions for SNPs after removing SNPs call rate < " %&% percentage)
-hist(imiss$F_MISS, main="distributions for individuals after removing SNPs call rate < " %&% percentage)
+hist(newlmiss$F_MISS, main="distribution of SNPs after removing SNPs with call rate < " %&% percentage)
+hist(imiss$F_MISS, main="distribution of individuals before filtering")
+hist(newimiss$F_MISS, main="distribution of individuals after SNPs filtering")
 dev.off()
 
 #stats
