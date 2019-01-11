@@ -64,7 +64,7 @@ echo "Using bim file ${BimFile:=${BFile:=$BfileDefault}.bim}"
 echo "Using bed file ${BedFile:=${BFile:=$BfileDefault}.bed}"
 echo "Using fam file ${FamFile:=${BFile:=$BfileDefault}.fam}"
 echo "Using Output Directory ${OutputDir:=$OutputDirDefault}"
-echo "Plotting IBD: ${PlotIBD:=PlotIBDDefault}"
+echo "Plotting IBD: ${PlotIBD:=$PlotIBDDefault}"
 
 if [ ! -e "${BimFile}" ] || [ ! -e "${FamFile}" ] || [ ! -e "${BedFile}" ]
 then
