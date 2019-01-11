@@ -131,9 +131,9 @@ esac
 "${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --missing --out "${OutputDir}"/missingness_hwe_steps/01initial_missingness
 #call rate distribution check
 #2 fitlers out based on genotyping threshold
-"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_filtered"
+"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_maf_${Maf}_filtered"
 #3 For validation of missingness threshold and call rate distribution check
-"${PlinkPath}"/plink --bfile "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_filtered" --missing --out "${OutputDir}"/missingness_hwe_steps/03missingness_validation
+"${PlinkPath}"/plink --bfile "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_maf_${Maf}_filtered" --missing --out "${OutputDir}"/missingness_hwe_steps/03missingness_validation
 #call rate distribution validation
 
 Rscript ~/gwasqc_pipeline/Rscripts/CallRateDistribution.R -t "${GenotypingThreshold}" --QCdir "${OutputDir}"
