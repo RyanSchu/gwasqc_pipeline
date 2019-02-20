@@ -4,7 +4,7 @@ library(argparse)
 
 parser <- ArgumentParser()
 parser$add_argument("--illumina", help="file path of the illumina FinalReport.txt")
-parser$add_argument("-o", "--out", help="output directory")
+parser$add_argument("-o", "--out", help="Use as in plink. Out is output prefix including full path and no file type extensions.")
 parser$add_argument("--skip", help="number of lines that preceed the header in input file. Default is 9", type="integer", default=9)
 args <- parser$parse_args()
 
