@@ -3,7 +3,7 @@ library(tidyr)
 library(argparse)
 
 parser <- ArgumentParser()
-parser$add_argument("--illumina", help="file path of the sample list")
+parser$add_argument("--illumina", help="file path of the illumina FinalReport.txt")
 parser$add_argument("-o", "--out", help="output directory")
 parser$add_argument("--skip", help="number of lines that preceed the header in input file. Default is 9", type="integer", default=9)
 args <- parser$parse_args()
