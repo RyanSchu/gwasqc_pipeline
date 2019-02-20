@@ -3,10 +3,11 @@
 PlinkPath=/usr/local/bin
 
 BfileDefault=~/QC/missingness_hwe_steps/05filtered_HWE
+PlotIBDDefault=True
 PrefilterDefault=none
 OutputDirDefault=~/QC
 RelatednessDefault=1
-
+RunIBD=true
 while :
 do
     case "$1" in
@@ -35,6 +36,10 @@ do
          	OutputDir="$2"
 	        shift 2
 	        ;;
+      --plotIDB-off)
+	        PlotIBD=False
+	      	shift 1
+	        ;;
       --relatedness | --rel) #Relatedness threshold you'd like to filter by
          	Relatedness="$2"
 	        shift 2
@@ -59,6 +64,7 @@ echo "Using bim file ${BimFile:=${BFile:=$BfileDefault}.bim}"
 echo "Using bed file ${BedFile:=${BFile:=$BfileDefault}.bed}"
 echo "Using fam file ${FamFile:=${BFile:=$BfileDefault}.fam}"
 echo "Using Output Directory ${OutputDir:=$OutputDirDefault}"
+echo "Plotting IBD: ${PlotIBD:=$PlotIBDDefault}"
 
 if [ ! -e "${BimFile}" ] || [ ! -e "${FamFile}" ] || [ ! -e "${BedFile}" ]
 then
@@ -102,8 +108,11 @@ esac
 #5b create genome file for ibd chart
 "${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --extract "${OutputDir}"/relatedness_steps/01LD_prune_list.prune.in --genome --out "${OutputDir}"/relatedness_steps/02relatedness
 #generate list of samples to remove based on relatedness
-Rscript ~/gwasqc_pipeline/Rscripts/ibd.R -o "${OutputDir}"/plots_stats --genome ${OutputDir}/relatedness_steps/02relatedness.genome 
 
+if [ "${PlotIBD}" = "True" ]
+then
+	Rscript ~/gwasqc_pipeline/Rscripts/ibd.R -o "${OutputDir}"/plots_stats --genome ${OutputDir}/relatedness_steps/02relatedness.genome 
+fi
 #5c heterozygosity check for unfiltered samples 
 "${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --het --out "${OutputDir}"/relatedness_steps/03het_unfiltered
 #5d LD prune snps from bfiles

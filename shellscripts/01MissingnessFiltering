@@ -6,6 +6,7 @@ AutosomeDefault=False
 BfileDefault=/home/wheelerlab2/Data/MESA_dbGaP_55081/phg000071.v2.NHLBI_SHARE_MESA.genotype-calls-matrixfmt.c1/SHARE_MESA_c1
 GenotypingThresholdDefault=0.01
 HWEpvalDefault=0.0001
+MafDefault=0.05
 OutputDirDefault=~/QC
 PrefilterDefault=none
 
@@ -45,6 +46,10 @@ do
       	  	HWEpval="$2"
 	        shift 2
 	        ;;
+      --maf) #minor allele frequency threshold
+         	Maf="$2"
+	        shift 2
+		;;
       -o | --output) #directory where you'd like to send all your QC folders - will be folder hierarchy
           	OutputDir="$2"
 	        shift 2
@@ -126,9 +131,9 @@ esac
 "${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --missing --out "${OutputDir}"/missingness_hwe_steps/01initial_missingness
 #call rate distribution check
 #2 fitlers out based on genotyping threshold
-"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_filtered"
+"${PlinkPath}"/plink --bed "${BedFile}" --bim "${BimFile}" --fam "${FamFile}" --geno "${GenotypingThreshold:=$GenotypingThresholdDefault}" --maf "${Maf:=$MafDefault}" --make-bed --out "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_maf_${Maf}_filtered"
 #3 For validation of missingness threshold and call rate distribution check
-"${PlinkPath}"/plink --bfile "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_filtered" --missing --out "${OutputDir}"/missingness_hwe_steps/03missingness_validation
+"${PlinkPath}"/plink --bfile "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_maf_${Maf}_filtered" --missing --out "${OutputDir}"/missingness_hwe_steps/03missingness_validation
 #call rate distribution validation
 
 Rscript ~/gwasqc_pipeline/Rscripts/CallRateDistribution.R -t "${GenotypingThreshold}" --QCdir "${OutputDir}"
