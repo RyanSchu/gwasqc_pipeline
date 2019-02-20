@@ -1,5 +1,5 @@
 # gwasqc_pipeline
-a quality control pipeline for gwas data. This pipeline was constructed to be run from the command line using linux. Please see the project wiki for full description of options.
+a quality control pipeline for gwas data. This pipeline was constructed to be run from the command line using linux. Please see the project wiki for full description of options and requirements.
 
 
 # References
