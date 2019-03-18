@@ -144,7 +144,7 @@ Rscript ~/gwasqc_pipeline/Rscripts/CallRateDistribution.R -t "${GenotypingThresh
 Rscript ~/gwasqc_pipeline/Rscripts/hwe.R --hwe "${OutputDir}"/missingness_hwe_steps/04initial_HWE_stats.hwe -o "${OutputDir}"/plots_stats/ -t initial
 
 #5 Filter by HWE threshold and recalculate staistics
-"${PlinkPath}"/plink --bfile "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_filtered"  --hwe "${HWEpval:=$HWEpvalDefault}" midp --make-bed --out "${OutputDir}"/missingness_hwe_steps/05filtered_HWE
+"${PlinkPath}"/plink --bfile "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_maf_${Maf}_filtered"  --hwe "${HWEpval:=$HWEpvalDefault}" midp --make-bed --out "${OutputDir}"/missingness_hwe_steps/05filtered_HWE
 "${PlinkPath}"/plink --bfile "${OutputDir}"/missingness_hwe_steps/05filtered_HWE --hardy --out "${OutputDir}"/missingness_hwe_steps/05filtered_HWE
 
 Rscript ~/gwasqc_pipeline/Rscripts/hwe.R --hwe "${OutputDir}"/missingness_hwe_steps/05filtered_HWE.hwe -o "${OutputDir}"/plots_stats/ -t filtered
