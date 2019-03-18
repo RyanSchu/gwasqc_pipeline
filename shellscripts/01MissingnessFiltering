@@ -139,7 +139,7 @@ esac
 Rscript ~/gwasqc_pipeline/Rscripts/CallRateDistribution.R -t "${GenotypingThreshold}" --QCdir "${OutputDir}"
 
 #4 for later calculating HWE statistics
-"${PlinkPath}"/plink --bfile "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_filtered" --hardy --out "${OutputDir}"/missingness_hwe_steps/04initial_HWE_stats
+"${PlinkPath}"/plink --bfile "${OutputDir}"/missingness_hwe_steps/"02geno_${GenotypingThreshold}_maf_${Maf}_filtered" --hardy --out "${OutputDir}"/missingness_hwe_steps/04initial_HWE_stats
 #calculate HWE statistics prefiltering
 Rscript ~/gwasqc_pipeline/Rscripts/hwe.R --hwe "${OutputDir}"/missingness_hwe_steps/04initial_HWE_stats.hwe -o "${OutputDir}"/plots_stats/ -t initial
 
